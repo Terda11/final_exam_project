@@ -51,10 +51,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Accès refusé" }, { status: 403 });
   }
 
-  const body = (await request.json()) as Record<string, unknown>;
+  const raw = await request.text();
+  const body = JSON.parse(raw) as Record<string, unknown>;
+  const insert = { ...body, artisan_id: user.id };
   const { data, error } = await supabase
     .from("products")
-    .insert([{ ...body, artisan_id: user.id }] as Parameters<ReturnType<typeof supabase.from>["insert"]>[0])
+    .insert([insert as never])
     .select()
     .single();
 

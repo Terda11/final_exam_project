@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, Mail, Phone, Instagram, Facebook, Twitter, Leaf } from "lucide-react";
+import { MapPin, Mail, Phone, Globe, Share2, MessageCircle, Leaf } from "lucide-react";
 import type { CategorySlug } from "@/types";
 
 // ── Types ─────────────────────────────────────────────────────────
@@ -34,9 +34,9 @@ const NAV_LINKS: FooterLink[] = [
 ];
 
 const SOCIAL_LINKS = [
-  { href: "https://instagram.com", label: "Instagram", Icon: Instagram },
-  { href: "https://facebook.com",  label: "Facebook",  Icon: Facebook  },
-  { href: "https://twitter.com",   label: "Twitter",   Icon: Twitter   },
+  { href: "https://instagram.com", label: "Instagram", Icon: Globe         },
+  { href: "https://facebook.com",  label: "Facebook",  Icon: Share2        },
+  { href: "https://twitter.com",   label: "Twitter",   Icon: MessageCircle },
 ] as const;
 
 // ── Component ─────────────────────────────────────────────────────

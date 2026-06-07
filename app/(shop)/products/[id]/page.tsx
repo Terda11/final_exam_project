@@ -40,15 +40,7 @@ async function getSimilarProducts(categoryId: string, excludeId: string): Promis
   return (data ?? []) as unknown as Product[];
 }
 
-export async function generateStaticParams(): Promise<{ id: string }[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("products")
-    .select("id")
-    .eq("is_active", true)
-    .limit(100);
-  return (data ?? []).map((row: { id: string }) => ({ id: row.id }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
