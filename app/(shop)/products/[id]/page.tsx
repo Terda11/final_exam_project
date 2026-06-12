@@ -2,9 +2,9 @@ import { notFound }       from "next/navigation";
 import Link                from "next/link";
 import { Suspense }        from "react";
 import type { Metadata }   from "next";
-import { Truck, ShieldCheck, ChevronRight } from "lucide-react";
+import { Truck, ShieldCheck, ChevronRight, RotateCcw } from "lucide-react";
 
-import { createClient }    from "@/lib/supabase/server";
+import { fetchProductById, fetchSimilarProducts } from "@/lib/data/products";
 import ProductGallery      from "@/components/products/ProductGallery";
 import AddToCartActions    from "@/components/products/AddToCartActions";
 import ProductCard         from "@/components/products/ProductCard";
@@ -17,27 +17,11 @@ interface PageProps {
 }
 
 async function getProduct(id: string): Promise<Product | null> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("products")
-    .select("*, category:categories(*), artisan:users(id, full_name, avatar_url)")
-    .eq("id", id)
-    .eq("is_active", true)
-    .single();
-  return data as unknown as Product | null;
+  return fetchProductById(id);
 }
 
 async function getSimilarProducts(categoryId: string, excludeId: string): Promise<Product[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("products")
-    .select("*, category:categories(*), artisan:users(id, full_name, avatar_url)")
-    .eq("category_id", categoryId)
-    .eq("is_active", true)
-    .neq("id", excludeId)
-    .order("created_at", { ascending: false })
-    .limit(4);
-  return (data ?? []) as unknown as Product[];
+  return fetchSimilarProducts(categoryId, excludeId);
 }
 
 export const dynamic = "force-dynamic";
@@ -54,7 +38,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title: product.name,
     description: desc,
     openGraph: {
-      title:       `${product.name} — RwandaShop`,
+      title:       `${product.name} — TechShop`,
       description: desc,
       images:      [{ url: ogImage, width: 800, height: 800, alt: product.name }],
       type:        "website",
@@ -74,20 +58,20 @@ function Breadcrumb({ product }: { product: Product }) {
     : null;
 
   return (
-    <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-gray-500 mb-8">
-      <Link href="/" className="hover:text-rwanda-green-700 transition-colors">Home</Link>
+    <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-slate-500 mb-8">
+      <Link href="/" className="hover:text-brand-400 transition-colors">Home</Link>
       <ChevronRight className="w-3 h-3 shrink-0" aria-hidden="true" />
-      <Link href="/products" className="hover:text-rwanda-green-700 transition-colors">Products</Link>
+      <Link href="/products" className="hover:text-brand-400 transition-colors">Products</Link>
       {categoryLabel && product.category && (
         <>
           <ChevronRight className="w-3 h-3 shrink-0" aria-hidden="true" />
-          <Link href={`/products?category=${product.category.slug}`} className="hover:text-rwanda-green-700 transition-colors">
+          <Link href={`/products?category=${product.category.slug}`} className="hover:text-brand-400 transition-colors">
             {categoryLabel}
           </Link>
         </>
       )}
       <ChevronRight className="w-3 h-3 shrink-0" aria-hidden="true" />
-      <span className="text-gray-900 font-medium truncate max-w-[180px]">{product.name}</span>
+      <span className="text-white font-medium truncate max-w-[180px]">{product.name}</span>
     </nav>
   );
 }
@@ -97,15 +81,15 @@ async function SimilarProducts({ product }: { product: Product }) {
   if (similar.length === 0) return null;
 
   return (
-    <section className="mt-20 border-t border-gray-100 pt-14" aria-labelledby="similar-heading">
+    <section className="mt-20 border-t border-surface-600 pt-14" aria-labelledby="similar-heading">
       <div className="flex items-center justify-between mb-8">
-        <h2 id="similar-heading" className="font-serif text-2xl font-bold text-gray-900">
+        <h2 id="similar-heading" className="font-sans text-2xl font-black text-white">
           You may also like
         </h2>
         {product.category && (
           <Link
             href={`/products?category=${product.category.slug}`}
-            className="text-sm font-medium text-rwanda-green-700 hover:text-rwanda-green-600 transition-colors"
+            className="text-sm font-medium text-brand-400 hover:text-brand-300 transition-colors"
           >
             View all →
           </Link>
@@ -146,58 +130,57 @@ export default async function ProductPage({ params }: PageProps) {
             {categoryLabel && p.category && (
               <Link
                 href={`/products?category=${p.category.slug}`}
-                className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-widest text-rwanda-green-700 hover:text-rwanda-green-600 transition-colors mb-2"
+                className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-brand-400 hover:text-brand-300 transition-colors mb-2"
               >
                 {categoryLabel}
               </Link>
             )}
-            <h1 className="font-serif text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
+            <h1 className="font-sans text-3xl sm:text-4xl font-black text-white leading-tight">
               {p.name}
             </h1>
-            {p.artisan && (
-              <p className="mt-2 text-sm text-gray-500">
-                By <span className="font-medium text-gray-700">{p.artisan.full_name}</span>
-              </p>
-            )}
           </div>
 
           <div className="flex items-baseline gap-3">
-            <span className="text-4xl font-bold text-rwanda-green-700 tabular-nums">
+            <span className="text-4xl font-black text-white tabular-nums">
               {formatPrice(p.price)}
             </span>
             {p.weight_grams && (
-              <span className="text-sm text-gray-400">{p.weight_grams}g</span>
+              <span className="text-sm text-slate-500">{p.weight_grams}g</span>
             )}
           </div>
 
-          <p className="text-gray-600 leading-relaxed text-sm sm:text-base">{p.description}</p>
+          <p className="text-slate-300 leading-relaxed text-sm sm:text-base">{p.description}</p>
 
           <AddToCartActions product={p} />
 
-          <ul className="border-t border-gray-100 pt-6 space-y-3">
-            <li className="flex items-center gap-3 text-sm text-gray-600">
-              <Truck className="w-5 h-5 text-rwanda-green-600 shrink-0" aria-hidden="true" />
-              <span>Delivery across Rwanda in 2 – 5 business days</span>
+          <ul className="border-t border-surface-600 pt-6 space-y-3">
+            <li className="flex items-center gap-3 text-sm text-slate-400">
+              <Truck className="w-5 h-5 text-brand-400 shrink-0" aria-hidden="true" />
+              <span>Fast delivery — 2 to 5 business days</span>
             </li>
-            <li className="flex items-center gap-3 text-sm text-gray-600">
-              <ShieldCheck className="w-5 h-5 text-rwanda-green-600 shrink-0" aria-hidden="true" />
-              <span>Authentic craftsmanship — satisfaction guaranteed</span>
+            <li className="flex items-center gap-3 text-sm text-slate-400">
+              <ShieldCheck className="w-5 h-5 text-brand-400 shrink-0" aria-hidden="true" />
+              <span>2-year manufacturer warranty included</span>
+            </li>
+            <li className="flex items-center gap-3 text-sm text-slate-400">
+              <RotateCcw className="w-5 h-5 text-brand-400 shrink-0" aria-hidden="true" />
+              <span>30-day free returns</span>
             </li>
           </ul>
         </div>
       </div>
 
       <Suspense fallback={
-        <div className="mt-20 border-t border-gray-100 pt-14">
-          <div className="h-8 w-48 bg-gray-200 rounded-lg animate-pulse mb-8" />
+        <div className="mt-20 border-t border-surface-600 pt-14">
+          <div className="h-8 w-48 bg-surface-700 rounded-lg animate-pulse mb-8" />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="card overflow-hidden animate-pulse">
-                <div className="aspect-square bg-gray-200" />
+                <div className="aspect-square bg-surface-600" />
                 <div className="p-4 space-y-2">
-                  <div className="h-3 w-14 bg-gray-200 rounded" />
-                  <div className="h-4 w-3/4 bg-gray-200 rounded" />
-                  <div className="h-9 bg-gray-200 rounded-md mt-3" />
+                  <div className="h-3 w-14 bg-surface-600 rounded" />
+                  <div className="h-4 w-3/4 bg-surface-600 rounded" />
+                  <div className="h-9 bg-surface-600 rounded-xl mt-3" />
                 </div>
               </div>
             ))}

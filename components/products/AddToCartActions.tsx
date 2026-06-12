@@ -4,6 +4,8 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ShoppingCart, Zap, Check, Minus, Plus } from "lucide-react";
 import { useCart } from "@/lib/hooks/useCart";
+import { useRequireAuth } from "@/lib/hooks/useAuth";
+import AuthGateModal from "@/components/auth/AuthGateModal";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/types";
 
@@ -20,14 +22,13 @@ interface AddToCartActionsProps {
 export default function AddToCartActions({ product }: AddToCartActionsProps) {
   const router = useRouter();
   const { addToCart } = useCart();
+  const { requireAuth, showLoginModal, setShowLoginModal } = useRequireAuth();
   const [quantity, setQuantity] = useState(1);
   const [toast, setToast] = useState<ToastState>({ visible: false, message: "", type: "success" });
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    return () => {
-      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    };
+    return () => { if (toastTimerRef.current) clearTimeout(toastTimerRef.current); };
   }, []);
 
   const showToast = useCallback((message: string, type: "success" | "error" = "success") => {
@@ -43,14 +44,18 @@ export default function AddToCartActions({ product }: AddToCartActionsProps) {
 
   function handleAddToCart() {
     if (product.stock === 0) return;
-    addToCart(product, quantity);
-    showToast(`${product.name} added to cart!`);
+    requireAuth(() => {
+      addToCart(product, quantity);
+      showToast(`${product.name} added to cart!`);
+    });
   }
 
   function handleBuyNow() {
     if (product.stock === 0) return;
-    addToCart(product, quantity);
-    router.push("/checkout");
+    requireAuth(() => {
+      addToCart(product, quantity);
+      router.push("/checkout");
+    });
   }
 
   const outOfStock = product.stock === 0;
@@ -58,18 +63,17 @@ export default function AddToCartActions({ product }: AddToCartActionsProps) {
 
   return (
     <div className="space-y-4">
-      {/* Stock indicator */}
       <p
         className={cn(
           "text-sm font-medium",
-          outOfStock ? "text-red-600" : lowStock ? "text-orange-500" : "text-rwanda-green-700"
+          outOfStock ? "text-red-400" : lowStock ? "text-orange-400" : "text-neon-400"
         )}
         aria-live="polite"
       >
         {outOfStock
           ? "Out of stock"
           : lowStock
-          ? `⚠️ Only ${product.stock} left in stock`
+          ? `⚠️ Only ${product.stock} left in stock — order soon`
           : `✓ In stock (${product.stock} available)`}
       </p>
 
@@ -77,7 +81,7 @@ export default function AddToCartActions({ product }: AddToCartActionsProps) {
       {!outOfStock && (
         <div className="flex items-center gap-4">
           <div
-            className="flex items-center border border-gray-300 rounded-lg overflow-hidden"
+            className="flex items-center border border-surface-500 rounded-xl overflow-hidden"
             role="group"
             aria-label="Quantity"
           >
@@ -85,12 +89,12 @@ export default function AddToCartActions({ product }: AddToCartActionsProps) {
               onClick={decrement}
               disabled={quantity <= 1}
               aria-label="Decrease quantity"
-              className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border-r border-gray-300"
+              className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-surface-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border-r border-surface-500"
             >
               <Minus className="w-3.5 h-3.5" />
             </button>
             <span
-              className="w-12 text-center text-sm font-semibold tabular-nums text-gray-900"
+              className="w-12 text-center text-sm font-bold tabular-nums text-white"
               aria-label={`Quantity: ${quantity}`}
             >
               {quantity}
@@ -99,12 +103,12 @@ export default function AddToCartActions({ product }: AddToCartActionsProps) {
               onClick={increment}
               disabled={quantity >= product.stock}
               aria-label="Increase quantity"
-              className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border-l border-gray-300"
+              className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-surface-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border-l border-surface-500"
             >
               <Plus className="w-3.5 h-3.5" />
             </button>
           </div>
-          <p className="text-xs text-gray-400">Max {product.stock}</p>
+          <p className="text-xs text-slate-500">Max {product.stock}</p>
         </div>
       )}
 
@@ -117,7 +121,7 @@ export default function AddToCartActions({ product }: AddToCartActionsProps) {
             "flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm",
             "transition-all duration-150",
             outOfStock
-              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              ? "bg-surface-600 text-slate-500 cursor-not-allowed"
               : "btn-primary hover:scale-[1.02] active:scale-100"
           )}
           aria-label={outOfStock ? "Out of stock" : "Add to cart"}
@@ -133,8 +137,8 @@ export default function AddToCartActions({ product }: AddToCartActionsProps) {
             "flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm",
             "transition-all duration-150",
             outOfStock
-              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-              : "bg-rwanda-green-50 text-rwanda-green-700 border border-rwanda-green-200 hover:bg-rwanda-green-100 hover:scale-[1.02] active:scale-100"
+              ? "bg-surface-600 text-slate-500 cursor-not-allowed"
+              : "bg-accent-500/15 text-accent-400 border border-accent-500/30 hover:bg-accent-500/25 hover:scale-[1.02] active:scale-100"
           )}
           aria-label="Buy now"
         >
@@ -155,15 +159,21 @@ export default function AddToCartActions({ product }: AddToCartActionsProps) {
             ? "opacity-100 translate-y-0"
             : "opacity-0 -translate-y-1 pointer-events-none",
           toast.type === "success"
-            ? "bg-rwanda-green-50 text-rwanda-green-800 border border-rwanda-green-200"
-            : "bg-red-50 text-red-800 border border-red-200"
+            ? "bg-neon-500/10 text-neon-300 border border-neon-500/20"
+            : "bg-red-500/10 text-red-400 border border-red-500/20"
         )}
       >
         {toast.type === "success" && (
-          <Check className="w-4 h-4 text-rwanda-green-600 shrink-0" aria-hidden="true" />
+          <Check className="w-4 h-4 text-neon-400 shrink-0" aria-hidden="true" />
         )}
         {toast.message}
       </div>
+
+      <AuthGateModal
+        open={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        productName={product.name}
+      />
     </div>
   );
 }

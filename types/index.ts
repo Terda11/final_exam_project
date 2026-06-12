@@ -4,7 +4,7 @@ import { z } from "zod";
 
 export type UUID          = string;
 export type ISODateString = string;
-export type RWF           = number;
+export type USD           = number;
 
 // ── User ──────────────────────────────────────────────────────────
 
@@ -52,34 +52,34 @@ export interface Category {
 }
 
 export type CategorySlug =
-  | "vannerie"
-  | "sculptures"
-  | "textiles"
-  | "poterie"
-  | "bijoux";
+  | "mobiles-tablets"
+  | "laptops-computers"
+  | "projectors"
+  | "audio-sound"
+  | "accessories";
 
 export const CATEGORY_SLUGS: CategorySlug[] = [
-  "vannerie",
-  "sculptures",
-  "textiles",
-  "poterie",
-  "bijoux",
+  "mobiles-tablets",
+  "laptops-computers",
+  "projectors",
+  "audio-sound",
+  "accessories",
 ];
 
 export const CATEGORY_LABELS: Record<CategorySlug, string> = {
-  vannerie:   "Basketry",
-  sculptures: "Sculptures",
-  textiles:   "Textiles",
-  poterie:    "Pottery",
-  bijoux:     "Jewellery",
+  "mobiles-tablets":   "Mobiles & Tablets",
+  "laptops-computers": "Laptops & Computers",
+  "projectors":        "Projectors",
+  "audio-sound":       "Audio & Sound",
+  "accessories":       "Accessories",
 };
 
 export const CATEGORY_EMOJIS: Record<CategorySlug, string> = {
-  vannerie:   "🧺",
-  sculptures: "🗿",
-  textiles:   "🧵",
-  poterie:    "🏺",
-  bijoux:     "💍",
+  "mobiles-tablets":   "📱",
+  "laptops-computers": "💻",
+  "projectors":        "📽️",
+  "audio-sound":       "🎧",
+  "accessories":       "🔌",
 };
 
 // ── Product ───────────────────────────────────────────────────────
@@ -88,7 +88,7 @@ export interface Product {
   id:           UUID;
   name:         string;
   description:  string;
-  price:        RWF;
+  price:        USD;
   stock:        number;
   category_id:  UUID;
   category?:    Category;
@@ -106,7 +106,7 @@ export interface Product {
 export const productSchema = z.object({
   name:         z.string().min(2, "Name required").max(120),
   description:  z.string().min(10, "Description too short").max(2000),
-  price:        z.number().int("Price must be a whole number in RWF").positive("Price must be > 0"),
+  price:        z.number().positive("Price must be > 0"),
   stock:        z.number().int().min(0, "Stock must be ≥ 0"),
   category_id:  z.string().uuid("Invalid category"),
   image_url:    z.string().url("Invalid image URL").nullable(),
@@ -128,7 +128,7 @@ export interface CartItem {
 
 export interface Cart {
   items: CartItem[];
-  total: RWF;
+  total: USD;
 }
 
 export const addToCartSchema = z.object({
@@ -159,7 +159,11 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   refunded:   "Refunded",
 };
 
-export type PaymentMethod = "cash_on_delivery" | "mtn_momo" | "airtel_money";
+export type PaymentMethod =
+  | "credit_card"
+  | "cash_on_delivery"
+  | "mtn_momo"
+  | "airtel_money";
 
 export interface Order {
   id:               UUID;
@@ -167,9 +171,9 @@ export interface Order {
   customer?:        Pick<User, "id" | "full_name" | "email" | "phone">;
   items:            OrderItem[];
   status:           OrderStatus;
-  total:            RWF;
-  shipping_fee:     RWF;
-  grand_total:      RWF;
+  total:            USD;
+  shipping_fee:     USD;
+  grand_total:      USD;
   shipping_address: ShippingAddress;
   payment_method:   PaymentMethod;
   notes:            string | null;
@@ -183,8 +187,8 @@ export interface OrderItem {
   product_id: UUID;
   product?:   Pick<Product, "id" | "name" | "image_url" | "category_id">;
   quantity:   number;
-  price:      RWF;
-  line_total: RWF;
+  price:      USD;
+  line_total: USD;
 }
 
 // ── Shipping ──────────────────────────────────────────────────────
@@ -201,7 +205,7 @@ export interface ShippingAddress {
 
 export const shippingAddressSchema = z.object({
   full_name:     z.string().min(2, "Full name required"),
-  phone:         z.string().regex(/^\+?2507[2389]\d{7}$/, "Invalid Rwanda number (e.g. +250 78X XXX XXX)"),
+  phone:         z.string().min(6, "Phone number required"),
   address_line1: z.string().min(4, "Address required"),
   address_line2: z.string().nullable().default(null),
   city:          z.string().min(2, "City required"),
@@ -213,7 +217,7 @@ export type ShippingAddressFormValues = z.infer<typeof shippingAddressSchema>;
 
 export const checkoutSchema = z.object({
   shipping_address: shippingAddressSchema,
-  payment_method:   z.enum(["cash_on_delivery", "mtn_momo", "airtel_money"]),
+  payment_method:   z.enum(["credit_card", "cash_on_delivery", "mtn_momo", "airtel_money"]),
   notes:            z.string().max(300).nullable().default(null),
 });
 
@@ -248,8 +252,8 @@ export interface ProductFilters {
   category_slug?: CategorySlug;
   featured?:      boolean;
   active?:        boolean;
-  min_price?:     RWF;
-  max_price?:     RWF;
+  min_price?:     USD;
+  max_price?:     USD;
   search?:        string;
   page?:          number;
   per_page?:      number;

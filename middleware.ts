@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/lib/supabase/types";
 
-const PROTECTED_ROUTES = ["/checkout", "/order-confirmation", "/account"];
+const PROTECTED_ROUTES = ["/checkout", "/order-confirmation", "/account", "/cart"];
 const ADMIN_ROUTES     = ["/admin"];
 const AUTH_ROUTES      = ["/login", "/register"];
 
@@ -44,6 +44,9 @@ export async function middleware(request: NextRequest) {
   if ((isProtectedRoute || isAdminRoute) && !user) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
+    if (pathname.startsWith("/checkout") || pathname.startsWith("/cart")) {
+      loginUrl.searchParams.set("reason", "order");
+    }
     return NextResponse.redirect(loginUrl);
   }
 

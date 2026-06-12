@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, Suspense } from "react";
 import { z } from "zod";
-import { Leaf, Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Zap, Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { createUserProfile } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
@@ -90,7 +90,17 @@ function PasswordStrength({ password }: { password: string }) {
 // ── Page ──────────────────────────────────────────────────────────
 
 export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterForm />
+    </Suspense>
+  );
+}
+
+function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") ?? "/";
 
   const [form, setForm] = useState<RegisterForm>({
     first_name:       "",
@@ -163,25 +173,25 @@ export default function RegisterPage() {
     }
 
     // Confirmation disabled → auto sign-in, redirect
-    router.push("/");
-    router.refresh();
+    const destination = redirectTo.startsWith("/") ? redirectTo : "/";
+    window.location.href = destination;
   };
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-slate-100 flex items-center justify-center px-4">
         <div className="max-w-md w-full card p-8 text-center space-y-4">
-          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mx-auto">
-            <CheckCircle2 className="w-8 h-8 text-green-600" />
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mx-auto">
+            <CheckCircle2 className="w-8 h-8 text-blue-600" />
           </div>
-          <h1 className="text-xl font-bold text-gray-900">Check your email</h1>
-          <p className="text-gray-600 text-sm">
+          <h1 className="text-xl font-black text-slate-900">Check your email</h1>
+          <p className="text-slate-600 text-sm">
             A confirmation email has been sent to{" "}
             <span className="font-semibold">{form.email}</span>. Click the link
-            to activate your account.
+            to activate your account, then sign in to place your order.
           </p>
           <Link
-            href="/login"
+            href={`/login?redirect=${encodeURIComponent(redirectTo)}`}
             className="btn-primary inline-block px-6 py-2.5 mt-2"
           >
             Go to sign in
@@ -192,22 +202,21 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-slate-100 flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full">
 
-        {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 group" aria-label="RwandaShop — Home">
-            <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-green-700 text-white shadow-sm group-hover:bg-green-600 transition-colors">
-              <Leaf className="w-5 h-5" />
+          <Link href="/" className="inline-flex items-center gap-2 group" aria-label="TechShop — Home">
+            <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-blue-600 text-white shadow-sm group-hover:bg-blue-700 transition-colors">
+              <Zap className="w-5 h-5" />
             </span>
-            <span className="font-serif text-2xl font-bold">
-              <span className="text-green-700">Rwanda</span>
-              <span className="text-amber-500">Shop</span>
+            <span className="font-black text-2xl">
+              <span className="text-slate-900">Tech</span>
+              <span className="text-blue-600">Shop</span>
             </span>
           </Link>
-          <h1 className="mt-4 text-2xl font-bold text-gray-900">Create an account</h1>
-          <p className="text-gray-500 text-sm mt-1">Join the RwandaShop community.</p>
+          <h1 className="mt-4 text-2xl font-black text-slate-900">Create an account</h1>
+          <p className="text-slate-500 text-sm mt-1">Join TechShop to browse, order and track your electronics.</p>
         </div>
 
         <div className="card p-8">
@@ -368,7 +377,7 @@ export default function RegisterPage() {
 
           <p className="mt-6 text-center text-sm text-gray-600">
             Already have an account?{" "}
-            <Link href="/login" className="text-green-700 font-semibold hover:underline">
+            <Link href={`/login?redirect=${encodeURIComponent(redirectTo)}`} className="text-blue-600 font-semibold hover:underline">
               Sign in
             </Link>
           </p>

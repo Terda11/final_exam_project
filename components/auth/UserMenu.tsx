@@ -36,7 +36,7 @@ function Avatar({ user, size = "md" }: { user: AppUser; size?: "sm" | "md" }) {
   return (
     <div
       className={cn(
-        "rounded-full bg-green-700 text-white font-semibold",
+        "rounded-full bg-blue-600 text-white font-semibold",
         "flex items-center justify-center ring-2 ring-white shrink-0",
         sizeClasses
       )}
@@ -100,8 +100,8 @@ function AuthenticatedMenu({ user }: { user: AppUser }) {
           "flex items-center gap-1.5 px-2 py-1.5 rounded-lg",
           "text-sm font-medium transition-colors duration-150",
           open
-            ? "text-green-700 bg-green-50"
-            : "text-gray-600 hover:text-green-700 hover:bg-gray-50"
+            ? "text-blue-700 bg-blue-50"
+            : "text-slate-600 hover:text-blue-700 hover:bg-blue-50"
         )}
       >
         <Avatar user={user} size="sm" />
@@ -184,7 +184,7 @@ function GuestButtons() {
         className={cn(
           "hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg",
           "text-sm font-medium transition-colors duration-150",
-          "text-gray-600 hover:text-green-700 hover:bg-gray-50"
+          "text-slate-600 hover:text-blue-700 hover:bg-blue-50"
         )}
       >
         <User className="w-4 h-4" />
@@ -195,7 +195,7 @@ function GuestButtons() {
         className={cn(
           "hidden sm:inline-flex items-center px-3 py-1.5 rounded-lg",
           "text-sm font-medium transition-colors duration-150",
-          "bg-green-700 text-white hover:bg-green-800"
+          "bg-blue-600 text-white hover:bg-blue-700"
         )}
       >
         Register

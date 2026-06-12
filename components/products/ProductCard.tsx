@@ -3,156 +3,164 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingCart, Check, Flame, Heart, Star } from "lucide-react";
+import { ShoppingCart, Check, Heart, Star, Eye } from "lucide-react";
 import { useCart } from "@/lib/hooks/useCart";
-import { formatPrice, getImageUrl } from "@/lib/utils";
+import { useRequireAuth } from "@/lib/hooks/useAuth";
+import AuthGateModal from "@/components/auth/AuthGateModal";
+import { formatPrice, getImageUrl, cn } from "@/lib/utils";
 import { CATEGORY_LABELS } from "@/types";
-import { cn } from "@/lib/utils";
 import type { Product } from "@/types";
 
-interface ProductCardProps {
-  product: Product;
-}
-
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
+  const { requireAuth, showLoginModal, setShowLoginModal } = useRequireAuth();
   const [added, setAdded] = useState(false);
+  const [wishlisted, setWishlisted] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 
   function handleAddToCart(e: React.MouseEvent) {
     e.preventDefault();
     if (product.stock === 0 || added) return;
-    setAdded(true);
-    addToCart(product, 1);
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => setAdded(false), 1500);
+
+    requireAuth(() => {
+      setAdded(true);
+      addToCart(product, 1);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setAdded(false), 1800);
+    });
   }
 
-  const categoryLabel = product.category
-    ? CATEGORY_LABELS[product.category.slug]
-    : null;
-
-  const isLowStock  = product.stock > 0 && product.stock < 5;
-  const isOutOfStock = product.stock === 0;
+  const categoryLabel = product.category ? CATEGORY_LABELS[product.category.slug] : null;
+  const isLowStock    = product.stock > 0 && product.stock < 5;
+  const isOutOfStock  = product.stock === 0;
 
   return (
-    <article
-      className={cn(
-        "card group relative flex flex-col",
-        "transition-all duration-200 ease-out",
-        "hover:shadow-card-hover hover:border-rwanda-green-200 hover:-translate-y-0.5"
-      )}
-    >
-      {/* Badges */}
-      <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1.5">
-        {product.is_featured && (
-          <span className="inline-flex items-center gap-1 bg-rwanda-gold-500 text-white text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full shadow-sm">
-            <Star className="w-2.5 h-2.5 fill-white" />
-            Featured
-          </span>
-        )}
-        {isLowStock && (
-          <span className="inline-flex items-center gap-1 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-            <Flame className="w-2.5 h-2.5" />
-            Almost sold out!
-          </span>
-        )}
-        {isOutOfStock && (
-          <span className="inline-flex items-center bg-gray-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-            Out of stock
-          </span>
-        )}
-      </div>
+    <>
+    <article className={cn(
+      "group relative flex h-full flex-col overflow-hidden rounded-xl",
+      "border-2 border-blue-100 bg-white/90 backdrop-blur-sm shadow-card",
+      "transition-all duration-300 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-card-hover"
+    )}>
 
-      {/* Image */}
-      <Link
-        href={`/products/${product.id}`}
-        className="block relative aspect-square bg-rwanda-beige-50 overflow-hidden"
-        tabIndex={-1}
-        aria-hidden="true"
-      >
-        <Image
-          src={getImageUrl(product.image_url)}
-          alt={product.name}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-        />
-      </Link>
-
-      {/* Info */}
-      <div className="flex flex-col flex-1 p-4">
-        <Link href={`/products/${product.id}`} className="flex flex-col flex-1 gap-1 group/link">
-          {categoryLabel && (
-            <span className="text-[10px] font-semibold text-rwanda-green-600 uppercase tracking-widest">
-              {categoryLabel}
-            </span>
-          )}
-          <h3 className="text-sm font-semibold text-gray-900 leading-snug line-clamp-2 group-hover/link:text-rwanda-green-700 transition-colors">
-            {product.name}
-          </h3>
-          {product.description && (
-            <p className="text-xs text-gray-500 line-clamp-2 mt-0.5 leading-relaxed">
-              {product.description}
-            </p>
-          )}
+      {/* Image box — square, clearly bordered */}
+      <div className="relative aspect-square border-b-2 border-slate-200 bg-slate-50">
+        <Link href={`/products/${product.id}`} tabIndex={-1} aria-hidden="true" className="block h-full">
+          <Image
+            src={getImageUrl(product.image_url)}
+            alt={product.name}
+            fill
+            className="object-contain p-5 transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width:640px)100vw,(max-width:1024px)50vw,33vw"
+          />
         </Link>
 
-        {/* Price + stock */}
-        <div className="mt-3 flex items-center justify-between">
-          <span className="text-base font-bold text-gray-900 tabular-nums">
-            {formatPrice(product.price)}
-          </span>
+        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5 z-10">
+          {product.is_featured && (
+            <span className="badge bg-amber-100 text-amber-700 border border-amber-200">
+              <Star className="w-2.5 h-2.5 fill-current" />
+              Featured
+            </span>
+          )}
           {isLowStock && (
-            <span className="text-[10px] text-orange-600 font-medium">
-              {product.stock} left
+            <span className="badge bg-orange-100 text-orange-700 border border-orange-200">
+              Only {product.stock} left
+            </span>
+          )}
+          {isOutOfStock && (
+            <span className="badge bg-red-100 text-red-600 border border-red-200">
+              Sold out
             </span>
           )}
         </div>
+
+        <button
+          onClick={(e) => { e.preventDefault(); setWishlisted(v => !v); }}
+          className={cn(
+            "absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-md flex items-center justify-center",
+            "bg-white shadow-sm border border-slate-200 transition-all duration-150",
+            "opacity-0 group-hover:opacity-100",
+            wishlisted ? "text-red-500 border-red-200 bg-red-50" : "text-slate-400 hover:text-red-500"
+          )}
+          aria-label="Add to wishlist"
+        >
+          <Heart className={cn("w-4 h-4", wishlisted && "fill-current")} />
+        </button>
+
+        <Link
+          href={`/products/${product.id}`}
+          className={cn(
+            "absolute bottom-3 left-1/2 -translate-x-1/2 z-10",
+            "inline-flex items-center gap-1.5 bg-white text-slate-700",
+            "text-xs font-semibold px-3 py-1.5 rounded-md shadow-sm border border-slate-200",
+            "opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0",
+            "transition-all duration-200 whitespace-nowrap"
+          )}
+        >
+          <Eye className="w-3.5 h-3.5" />
+          Quick view
+        </Link>
       </div>
 
-      {/* Actions */}
-      <div className="px-4 pb-4 flex gap-2">
+      {/* Info box — name then price directly underneath */}
+      <div className="flex flex-1 flex-col gap-2 p-4">
+        {categoryLabel && (
+          <Link
+            href={`/products?category=${product.category?.slug}`}
+            className="self-start text-[10px] font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 hover:bg-blue-100 transition-colors"
+          >
+            {categoryLabel}
+          </Link>
+        )}
+
+        <Link href={`/products/${product.id}`} className="block">
+          <h3 className="text-sm font-semibold text-slate-800 leading-snug line-clamp-2 hover:text-blue-700 transition-colors">
+            {product.name}
+          </h3>
+        </Link>
+
+        <p className="text-lg font-black text-blue-700 tabular-nums leading-none">
+          {formatPrice(product.price)}
+        </p>
+
+        {isLowStock && (
+          <p className="text-[11px] font-semibold text-orange-600">
+            {product.stock} in stock
+          </p>
+        )}
+      </div>
+
+      <div className="border-t-2 border-slate-100 px-4 pb-4 pt-3 mt-auto">
         <button
           onClick={handleAddToCart}
           disabled={isOutOfStock}
-          aria-label={isOutOfStock ? "Out of stock" : `Add ${product.name} to cart`}
           className={cn(
-            "flex-1 flex items-center justify-center gap-1.5 py-2 rounded-md text-sm font-medium",
-            "transition-all duration-150",
+            "w-full flex items-center justify-center gap-2 py-2.5 rounded-md text-sm font-semibold transition-all duration-200",
             added
-              ? "bg-rwanda-green-600 text-white scale-95"
+              ? "bg-green-600 text-white scale-[.98]"
               : isOutOfStock
-              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-              : "btn-primary"
+              ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+              : "bg-blue-600 text-white hover:bg-blue-700 active:scale-[.98] shadow-sm"
           )}
+          aria-label={isOutOfStock ? "Out of stock" : `Add ${product.name} to cart`}
         >
           {added ? (
-            <>
-              <Check className="w-4 h-4" />
-              Added!
-            </>
+            <><Check className="w-4 h-4" /> Added to cart!</>
+          ) : isOutOfStock ? (
+            "Out of stock"
           ) : (
-            <>
-              <ShoppingCart className="w-4 h-4" />
-              {isOutOfStock ? "Sold out" : "Add to cart"}
-            </>
+            <><ShoppingCart className="w-4 h-4" /> Add to Cart</>
           )}
-        </button>
-
-        <button
-          className="p-2 rounded-md border border-gray-200 text-gray-400 hover:text-red-400 hover:border-red-200 transition-colors"
-          aria-label="Add to wishlist"
-        >
-          <Heart className="w-4 h-4" />
         </button>
       </div>
     </article>
+
+    <AuthGateModal
+      open={showLoginModal}
+      onClose={() => setShowLoginModal(false)}
+      productName={product.name}
+    />
+    </>
   );
 }

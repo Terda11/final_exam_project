@@ -1,94 +1,86 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { DEMO_CATEGORIES } from "@/lib/data/demo-products";
+import { ELECTRONICS_SLUGS } from "@/lib/constants/categories";
 import { CATEGORY_EMOJIS } from "@/types";
-import type { Category } from "@/types";
+import type { Category, CategorySlug } from "@/types";
 
 async function getCategories(): Promise<Category[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("categories")
-    .select("*")
-    .order("name", { ascending: true });
-  return (data ?? []) as Category[];
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("categories")
+      .select("*")
+      .order("name", { ascending: true });
+
+    const filtered = (data ?? []).filter((c) =>
+      ELECTRONICS_SLUGS.includes(c.slug as CategorySlug)
+    ) as Category[];
+
+    if (filtered.length > 0) return filtered;
+  } catch {
+    // Fall through to demo categories.
+  }
+
+  return DEMO_CATEGORIES;
 }
 
-const CAT_COLORS: Record<string, { card: string; icon: string; dot: string }> = {
-  vannerie:   { card: "hover:bg-amber-50  hover:border-amber-200",  icon: "bg-amber-100",  dot: "bg-amber-500"  },
-  sculptures: { card: "hover:bg-stone-50  hover:border-stone-200",  icon: "bg-stone-100",  dot: "bg-stone-500"  },
-  textiles:   { card: "hover:bg-violet-50 hover:border-violet-200", icon: "bg-violet-100", dot: "bg-violet-500" },
-  poterie:    { card: "hover:bg-orange-50 hover:border-orange-200", icon: "bg-orange-100", dot: "bg-orange-500" },
-  bijoux:     { card: "hover:bg-rose-50   hover:border-rose-200",   icon: "bg-rose-100",   dot: "bg-rose-500"   },
+const CAT_STYLES: Record<string, { bg: string; icon: string; border: string; hover: string }> = {
+  "mobiles-tablets":   { bg: "bg-blue-50",    icon: "bg-blue-100 text-blue-600",     border: "border-blue-200",    hover: "hover:border-blue-400 hover:bg-blue-50"    },
+  "laptops-computers": { bg: "bg-indigo-50",  icon: "bg-indigo-100 text-indigo-600", border: "border-indigo-200",  hover: "hover:border-indigo-400 hover:bg-indigo-50"  },
+  "projectors":        { bg: "bg-purple-50",  icon: "bg-purple-100 text-purple-600", border: "border-purple-200",  hover: "hover:border-purple-400 hover:bg-purple-50"  },
+  "audio-sound":       { bg: "bg-emerald-50", icon: "bg-emerald-100 text-emerald-600", border: "border-emerald-200", hover: "hover:border-emerald-400 hover:bg-emerald-50" },
+  "accessories":       { bg: "bg-amber-50",   icon: "bg-amber-100 text-amber-600",   border: "border-amber-200",   hover: "hover:border-amber-400 hover:bg-amber-50"    },
 };
-
-const DEFAULT_COLORS = { card: "hover:bg-gray-50 hover:border-gray-200", icon: "bg-gray-100", dot: "bg-gray-400" };
+const DEFAULT_STYLE = { bg: "bg-slate-50", icon: "bg-slate-100 text-slate-600", border: "border-slate-200", hover: "hover:border-slate-300" };
 
 export default async function CategoryBar() {
   const categories = await getCategories();
   if (categories.length === 0) return null;
 
   return (
-    <section className="bg-white py-16 sm:py-20" aria-labelledby="categories-heading">
+    <section className="bg-gradient-to-br from-indigo-50 via-blue-50 to-slate-100 py-14 sm:py-16 border-b border-blue-100/60" aria-labelledby="categories-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Header */}
-        <div className="flex items-end justify-between mb-10">
+        <div className="flex items-end justify-between mb-8">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-green-700 mb-2">Explore</p>
-            <h2 id="categories-heading" className="font-serif text-3xl sm:text-4xl font-bold text-gray-900">
-              Our categories
+            <p className="section-label mb-1.5">Shop by category</p>
+            <h2 id="categories-heading" className="text-2xl sm:text-3xl font-black text-slate-900">
+              What are you looking for?
             </h2>
           </div>
-          <Link
-            href="/products"
-            className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-green-700 transition-colors group"
-          >
-            Browse all
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          <Link href="/products" className="hidden sm:inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors group">
+            Browse all <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </div>
 
-        {/* Grid */}
-        <div
-          className="flex gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:gap-5 sm:overflow-visible sm:pb-0"
-          role="list"
-        >
-          {categories.map((category) => {
-            const emoji  = CATEGORY_EMOJIS[category.slug] ?? "🎨";
-            const colors = CAT_COLORS[category.slug] ?? DEFAULT_COLORS;
-
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          {categories.map((cat) => {
+            const emoji = CATEGORY_EMOJIS[cat.slug as keyof typeof CATEGORY_EMOJIS] ?? "⚡";
+            const s     = CAT_STYLES[cat.slug] ?? DEFAULT_STYLE;
             return (
               <Link
-                key={category.id}
-                href={`/products?category=${category.slug}`}
-                role="listitem"
-                className={`group relative flex flex-col items-center gap-4 p-6 rounded-2xl border border-gray-100 bg-white shrink-0 w-40 sm:w-auto transition-all duration-200 hover:shadow-lg hover:-translate-y-1 ${colors.card}`}
+                key={cat.id}
+                href={`/products?category=${cat.slug}`}
+                className={`group flex flex-col items-center gap-3 p-5 rounded-xl bg-white/80 backdrop-blur-sm border-2 ${s.border} ${s.hover} shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md text-center`}
               >
-                {/* Decorative dot */}
-                <span className={`absolute top-3 right-3 w-1.5 h-1.5 rounded-full ${colors.dot} opacity-30`} aria-hidden="true" />
-
-                {/* Icon */}
-                <div className={`flex items-center justify-center w-16 h-16 rounded-2xl ${colors.icon} text-3xl group-hover:scale-110 transition-transform duration-200 shadow-sm select-none`}>
+                <div className={`flex items-center justify-center w-14 h-14 rounded-xl text-2xl ${s.icon} group-hover:scale-110 transition-transform duration-200`}>
                   {emoji}
                 </div>
-
-                <div className="text-center">
-                  <p className="text-sm font-bold text-gray-900 transition-colors">{category.name}</p>
-                  {category.description && (
-                    <p className="text-[11px] text-gray-400 mt-1 leading-snug line-clamp-2">{category.description}</p>
+                <div>
+                  <p className="text-sm font-bold text-slate-800 group-hover:text-blue-700 transition-colors leading-tight">{cat.name}</p>
+                  {cat.description && (
+                    <p className="text-[11px] text-slate-500 mt-1 leading-snug line-clamp-2">{cat.description}</p>
                   )}
                 </div>
-
-                <span className="flex items-center gap-1 text-[11px] font-semibold text-green-700 opacity-0 group-hover:opacity-100 -mt-1 transition-opacity">
-                  Discover <ArrowRight className="w-3 h-3" />
-                </span>
               </Link>
             );
           })}
         </div>
 
-        <div className="mt-6 sm:hidden text-center">
-          <Link href="/products" className="text-sm font-medium text-green-700 hover:underline">
+        <div className="mt-5 sm:hidden text-center">
+          <Link href="/products" className="text-sm font-semibold text-blue-600 hover:underline">
             View all products →
           </Link>
         </div>

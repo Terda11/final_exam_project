@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
 import { z } from "zod";
-import { Leaf, Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Zap, Eye, EyeOff, AlertCircle, CheckCircle2, ShoppingBag } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -86,6 +86,7 @@ function LoginForm() {
   const router        = useRouter();
   const searchParams  = useSearchParams();
   const redirectTo    = searchParams.get("redirect") ?? "/";
+  const orderReason   = searchParams.get("reason") === "order";
   const justRegistered = searchParams.get("registered") === "true";
   const authError      = searchParams.get("error") === "auth";
 
@@ -139,25 +140,32 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-slate-100 flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full">
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 group" aria-label="RwandaShop — Home">
-            <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-green-700 text-white shadow-sm group-hover:bg-green-600 transition-colors">
-              <Leaf className="w-5 h-5" />
+          <Link href="/" className="inline-flex items-center gap-2 group" aria-label="TechShop — Home">
+            <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-blue-600 text-white shadow-sm group-hover:bg-blue-700 transition-colors">
+              <Zap className="w-5 h-5" />
             </span>
-            <span className="font-serif text-2xl font-bold">
-              <span className="text-green-700">Rwanda</span>
-              <span className="text-amber-500">Shop</span>
+            <span className="font-black text-2xl">
+              <span className="text-slate-900">Tech</span>
+              <span className="text-blue-600">Shop</span>
             </span>
           </Link>
-          <h1 className="mt-4 text-2xl font-bold text-gray-900">Sign in</h1>
-          <p className="text-gray-500 text-sm mt-1">Welcome back! Sign in to your account.</p>
+          <h1 className="mt-4 text-2xl font-black text-slate-900">Sign in</h1>
+          <p className="text-slate-500 text-sm mt-1">Welcome back! Sign in to shop and place orders.</p>
         </div>
 
         <div className="card p-8 space-y-6">
+
+          {orderReason && (
+            <div className="flex items-start gap-3 bg-blue-50 border-2 border-blue-200 text-blue-800 text-sm px-4 py-3 rounded-xl">
+              <ShoppingBag className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>Please sign in or create an account to add products to your cart and complete your order.</span>
+            </div>
+          )}
 
           {/* Registration success banner */}
           {justRegistered && (
@@ -230,7 +238,7 @@ function LoginForm() {
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="text-xs text-green-700 hover:underline font-medium"
+                  className="text-xs text-blue-600 hover:underline font-medium"
                 >
                   Forgot password?
                 </Link>
@@ -274,7 +282,7 @@ function LoginForm() {
           {/* Register link */}
           <p className="text-center text-sm text-gray-600">
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-green-700 font-semibold hover:underline">
+            <Link href={`/register?redirect=${encodeURIComponent(redirectTo)}`} className="text-blue-600 font-semibold hover:underline">
               Create account
             </Link>
           </p>

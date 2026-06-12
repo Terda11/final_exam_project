@@ -4,18 +4,19 @@ import type { Metadata } from "next";
 import HeroSection              from "@/components/home/HeroSection";
 import StatsSection             from "@/components/home/StatsSection";
 import CategoryBar              from "@/components/home/CategoryBar";
+import NewArrivals              from "@/components/home/NewArrivals";
 import FeaturedProducts         from "@/components/home/FeaturedProducts";
 import FeaturedProductsSkeleton from "@/components/home/FeaturedProductsSkeleton";
 import PromoBanner              from "@/components/home/PromoBanner";
 import WhyUsSection             from "@/components/home/WhyUsSection";
 
 export const metadata: Metadata = {
-  title: "Home — Authentic Rwandan Crafts",
+  title: "Home — TechShop",
   description:
-    "Discover and buy authentic Rwandan crafts: Agaseke basketry, Imigongo sculptures, Kitenge textiles and jewellery. Delivered across Rwanda. Every purchase directly supports local artisans.",
+    "Shop the latest smartphones, laptops, audio gear, gaming consoles, and accessories. Genuine products, fast delivery, and 2-year warranty on everything.",
   openGraph: {
-    title:       "RwandaShop — Rwandan crafts at your fingertips",
-    description: "Marketplace dedicated to Rwandan crafts. Support local artisans.",
+    title:       "TechShop — Premium Electronics",
+    description: "Your destination for the latest electronics at the best prices.",
     type:        "website",
   },
 };
@@ -26,6 +27,7 @@ export default function HomePage() {
       <HeroSection />
       <StatsSection />
       <CategoryBar />
+      <NewArrivals />
       <Suspense fallback={<FeaturedProductsSkeleton />}>
         <FeaturedProducts />
       </Suspense>

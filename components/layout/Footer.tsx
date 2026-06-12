@@ -1,181 +1,144 @@
 import Link from "next/link";
-import { MapPin, Mail, Phone, Globe, Share2, MessageCircle, Leaf } from "lucide-react";
+import { Mail, Phone, Zap } from "lucide-react";
 import type { CategorySlug } from "@/types";
 
-// ── Types ─────────────────────────────────────────────────────────
-
-interface FooterLink {
-  href:  string;
-  label: string;
-}
-
-interface CategoryEntry {
-  slug:  CategorySlug;
-  label: string;
-  emoji: string;
-}
-
-// ── Data ──────────────────────────────────────────────────────────
-
-const CATEGORIES: CategoryEntry[] = [
-  { slug: "vannerie",   label: "Basketry",   emoji: "🧺" },
-  { slug: "sculptures", label: "Sculptures", emoji: "🗿" },
-  { slug: "textiles",   label: "Textiles",   emoji: "🧵" },
-  { slug: "poterie",    label: "Pottery",    emoji: "🏺" },
-  { slug: "bijoux",     label: "Jewellery",  emoji: "💍" },
+const CATEGORIES: { slug: CategorySlug; label: string; emoji: string }[] = [
+  { slug: "mobiles-tablets",   label: "Mobiles & Tablets",   emoji: "📱" },
+  { slug: "laptops-computers", label: "Laptops & Computers", emoji: "💻" },
+  { slug: "projectors",        label: "Projectors",          emoji: "📽️" },
+  { slug: "audio-sound",       label: "Audio & Sound",       emoji: "🎧" },
+  { slug: "accessories",       label: "Accessories",         emoji: "🔌" },
 ];
 
-const NAV_LINKS: FooterLink[] = [
-  { href: "/",              label: "Home"       },
-  { href: "/products",      label: "Products"   },
-  { href: "/about",         label: "About"      },
-  { href: "/shipping",      label: "Shipping"   },
-  { href: "/account",       label: "My account" },
+const NAV = [
+  { href: "/",         label: "Home"       },
+  { href: "/products", label: "Products"   },
+  { href: "/about",    label: "About"      },
+  { href: "/cart",     label: "My cart"    },
 ];
 
-const SOCIAL_LINKS = [
-  { href: "https://instagram.com", label: "Instagram", Icon: Globe         },
-  { href: "https://facebook.com",  label: "Facebook",  Icon: Share2        },
-  { href: "https://twitter.com",   label: "Twitter",   Icon: MessageCircle },
-] as const;
+function SocialIcon({ label }: { label: "Twitter" | "Instagram" | "Facebook" }) {
+  if (label === "Twitter") {
+    return (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+      </svg>
+    );
+  }
 
-// ── Component ─────────────────────────────────────────────────────
+  if (label === "Instagram") {
+    return (
+      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+        <rect x="2" y="2" width="20" height="20" rx="5" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+    </svg>
+  );
+}
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-400">
-      {/* ── Rwandan decorative band ──────────────────────────────── */}
-      <div className="h-1 w-full bg-gradient-rwanda" aria-hidden="true" />
-
+    <footer className="bg-slate-900 text-slate-400">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
 
-          {/* ── Column 1: About ──────────────────────────────────── */}
+          {/* Brand */}
           <div className="space-y-4">
-            {/* Logo */}
-            <Link href="/" className="inline-flex items-center gap-2 group" aria-label="RwandaShop">
-              <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-rwanda-green-700 text-white">
-                <Leaf className="w-4 h-4" />
+            <Link href="/" className="inline-flex items-center gap-2 group">
+              <span className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center group-hover:bg-blue-500 transition-colors">
+                <Zap className="w-4 h-4" />
               </span>
-              <span className="font-serif text-xl font-bold">
-                <span className="text-white">Rwanda</span>
-                <span className="text-rwanda-gold-400">Shop</span>
+              <span className="font-black text-xl">
+                <span className="text-white">Tech</span>
+                <span className="text-blue-400">Shop</span>
               </span>
             </Link>
-
             <p className="text-sm leading-relaxed max-w-xs">
-              The first marketplace dedicated to authentic Rwandan crafts.
-              Every purchase directly supports local artisans across Kigali and the provinces.
+              Rwanda&apos;s trusted electronics store. Genuine products, fast delivery, 2-year warranty.
             </p>
-
-            {/* Social links */}
-            <div className="flex items-center gap-3 pt-1">
-              {SOCIAL_LINKS.map(({ href, label, Icon }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-800 text-gray-400 hover:bg-rwanda-green-700 hover:text-white transition-colors duration-150"
-                >
-                  <Icon className="w-4 h-4" />
+            <div className="flex items-center gap-2 pt-1">
+              {[
+                { href: "https://twitter.com",   label: "Twitter" as const },
+                { href: "https://instagram.com", label: "Instagram" as const },
+                { href: "https://facebook.com",  label: "Facebook" as const },
+              ].map(({ href, label }) => (
+                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
+                  className="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition-colors">
+                  <SocialIcon label={label} />
                 </a>
               ))}
             </div>
           </div>
 
-          {/* ── Column 2: Navigation & Categories ────────────────── */}
-          <div className="grid grid-cols-2 gap-8">
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-widest text-gray-300 mb-4">
-                Navigation
-              </h3>
-              <ul className="space-y-2.5 text-sm">
-                {NAV_LINKS.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="hover:text-white transition-colors duration-150"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-widest text-gray-300 mb-4">
-                Categories
-              </h3>
-              <ul className="space-y-2.5 text-sm">
-                {CATEGORIES.map((cat) => (
-                  <li key={cat.slug}>
-                    <Link
-                      href={`/products?category=${cat.slug}`}
-                      className="flex items-center gap-2 hover:text-white transition-colors duration-150"
-                    >
-                      <span className="text-sm leading-none">{cat.emoji}</span>
-                      {cat.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {/* Navigation */}
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300 mb-4">Navigation</h3>
+            <ul className="space-y-2.5 text-sm">
+              {NAV.map(({ href, label }) => (
+                <li key={href}>
+                  <Link href={href} className="hover:text-white transition-colors">{label}</Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {/* ── Column 3: Contact ─────────────────────────────────── */}
+          {/* Categories */}
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-widest text-gray-300 mb-4">
-              Contact
-            </h3>
-            <ul className="space-y-3.5 text-sm">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300 mb-4">Categories</h3>
+            <ul className="space-y-2.5 text-sm">
+              {CATEGORIES.map((c) => (
+                <li key={c.slug}>
+                  <Link href={`/products?category=${c.slug}`} className="flex items-center gap-2 hover:text-white transition-colors">
+                    <span>{c.emoji}</span>{c.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-widest text-slate-300 mb-4">Contact</h3>
+            <ul className="space-y-3 text-sm">
               <li>
-                <a
-                  href="mailto:contact@rwandashop.rw"
-                  className="flex items-start gap-3 hover:text-white transition-colors duration-150 group"
-                >
-                  <Mail className="w-4 h-4 mt-0.5 shrink-0 text-rwanda-green-500 group-hover:text-rwanda-green-400" />
-                  contact@rwandashop.rw
+                <a href="mailto:support@techshop.rw" className="flex items-center gap-2 hover:text-white transition-colors group">
+                  <Mail className="w-4 h-4 text-blue-400 group-hover:text-blue-300 shrink-0" />
+                  support@techshop.rw
                 </a>
               </li>
               <li>
-                <a
-                  href="tel:+250788000000"
-                  className="flex items-start gap-3 hover:text-white transition-colors duration-150 group"
-                >
-                  <Phone className="w-4 h-4 mt-0.5 shrink-0 text-rwanda-green-500 group-hover:text-rwanda-green-400" />
+                <a href="tel:+250788000000" className="flex items-center gap-2 hover:text-white transition-colors group">
+                  <Phone className="w-4 h-4 text-blue-400 group-hover:text-blue-300 shrink-0" />
                   +250 788 000 000
                 </a>
               </li>
-              <li className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-rwanda-green-500" />
-                <address className="not-italic leading-relaxed">
-                  KG 11 Ave, Kicukiro<br />
-                  Kigali, Rwanda
-                </address>
-              </li>
             </ul>
-
-            {/* UNILAK badge */}
-            <div className="mt-6 inline-flex items-center gap-2 bg-gray-800 rounded-lg px-3 py-2">
-              <span className="w-2 h-2 rounded-full bg-rwanda-green-500 animate-pulse" aria-hidden="true" />
-              <span className="text-xs text-gray-400">UNILAK Project 2026</span>
+            <div className="mt-6">
+              <p className="text-xs font-bold text-slate-300 mb-3">We accept</p>
+              <div className="flex flex-wrap gap-2">
+                {["Visa", "Mastercard", "MTN MoMo", "Airtel"].map((p) => (
+                  <span key={p} className="px-2.5 py-1 bg-slate-800 border border-slate-700 rounded-lg text-[10px] font-semibold text-slate-300">
+                    {p}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* ── Footer bottom: copyright ──────────────────────────── */}
-        <div className="mt-12 pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
-          <p>
-            &copy; 2026 <span className="text-gray-400 font-medium">RwandaShop</span>.
-            All rights reserved.
-          </p>
-          <p className="flex items-center gap-1">
-            Made with
-            <span className="text-rwanda-red-500 mx-0.5" aria-label="love">♥</span>
-            in Rwanda
+        {/* Bottom */}
+        <div className="mt-12 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+          <p>&copy; 2026 <span className="text-slate-400 font-semibold">TechShop Rwanda</span>. All rights reserved.</p>
+          <p className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            Payments are simulated — no real charges made
           </p>
         </div>
       </div>
