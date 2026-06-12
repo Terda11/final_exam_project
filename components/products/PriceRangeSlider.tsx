@@ -5,7 +5,7 @@ import { useRef, useTransition, useState, useEffect } from "react";
 import { formatPrice } from "@/lib/utils";
 
 const MIN_PRICE = 0;
-const MAX_PRICE = 100_000;
+const MAX_PRICE = 2000000;  // RWF 2,000,000
 const DEBOUNCE_MS = 400;
 
 export default function PriceRangeSlider() {
@@ -15,12 +15,8 @@ export default function PriceRangeSlider() {
   const [, startTransition] = useTransition();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [min, setMin] = useState(
-    Number(searchParams.get("min_price") ?? MIN_PRICE)
-  );
-  const [max, setMax] = useState(
-    Number(searchParams.get("max_price") ?? MAX_PRICE)
-  );
+  const [min, setMin] = useState(Number(searchParams.get("min_price") ?? MIN_PRICE));
+  const [max, setMax] = useState(Number(searchParams.get("max_price") ?? MAX_PRICE));
 
   useEffect(() => {
     setMin(Number(searchParams.get("min_price") ?? MIN_PRICE));
@@ -31,29 +27,21 @@ export default function PriceRangeSlider() {
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
-      if (nextMin > MIN_PRICE) {
-        params.set("min_price", String(nextMin));
-      } else {
-        params.delete("min_price");
-      }
-      if (nextMax < MAX_PRICE) {
-        params.set("max_price", String(nextMax));
-      } else {
-        params.delete("max_price");
-      }
+      if (nextMin > MIN_PRICE) { params.set("min_price", String(nextMin)); } else { params.delete("min_price"); }
+      if (nextMax < MAX_PRICE) { params.set("max_price", String(nextMax)); } else { params.delete("max_price"); }
       params.delete("page");
       startTransition(() => router.push(`${pathname}?${params.toString()}`));
     }, DEBOUNCE_MS);
   }
 
   function handleMin(e: React.ChangeEvent<HTMLInputElement>) {
-    const v = Math.min(Number(e.target.value), max - 1000);
+    const v = Math.min(Number(e.target.value), max - 10000);
     setMin(v);
     pushRange(v, max);
   }
 
   function handleMax(e: React.ChangeEvent<HTMLInputElement>) {
-    const v = Math.max(Number(e.target.value), min + 1000);
+    const v = Math.max(Number(e.target.value), min + 10000);
     setMax(v);
     pushRange(min, v);
   }
@@ -63,56 +51,42 @@ export default function PriceRangeSlider() {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between text-xs text-gray-600">
+      <div className="flex items-center justify-between text-xs text-slate-400">
         <span className="font-medium tabular-nums">{formatPrice(min)}</span>
         <span className="font-medium tabular-nums">{formatPrice(max)}</span>
       </div>
 
-      {/* Double range track */}
       <div className="relative h-5 flex items-center">
-        {/* Track background */}
-        <div className="absolute inset-x-0 h-1.5 bg-gray-200 rounded-full" />
-        {/* Active range fill */}
+        <div className="absolute inset-x-0 h-1.5 bg-surface-500 rounded-full" />
         <div
-          className="absolute h-1.5 bg-rwanda-green-500 rounded-full"
+          className="absolute h-1.5 bg-brand-500 rounded-full"
           style={{ left: `${minPct}%`, right: `${100 - maxPct}%` }}
         />
 
-        {/* Min thumb */}
         <input
-          type="range"
-          min={MIN_PRICE}
-          max={MAX_PRICE}
-          step={1000}
-          value={min}
-          onChange={handleMin}
-          aria-label="Prix minimum"
+          type="range" min={MIN_PRICE} max={MAX_PRICE} step={10000}
+          value={min} onChange={handleMin}
+          aria-label="Minimum price"
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
         />
-        {/* Max thumb (overlaid) */}
         <input
-          type="range"
-          min={MIN_PRICE}
-          max={MAX_PRICE}
-          step={1000}
-          value={max}
-          onChange={handleMax}
-          aria-label="Prix maximum"
+          type="range" min={MIN_PRICE} max={MAX_PRICE} step={10000}
+          value={max} onChange={handleMax}
+          aria-label="Maximum price"
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
         />
 
-        {/* Visual thumbs */}
         <div
-          className="absolute w-4 h-4 bg-white border-2 border-rwanda-green-600 rounded-full shadow-sm pointer-events-none z-30"
+          className="absolute w-4 h-4 bg-surface-800 border-2 border-brand-500 rounded-full shadow-glow-blue pointer-events-none z-30"
           style={{ left: `calc(${minPct}% - 8px)` }}
         />
         <div
-          className="absolute w-4 h-4 bg-white border-2 border-rwanda-green-600 rounded-full shadow-sm pointer-events-none z-30"
+          className="absolute w-4 h-4 bg-surface-800 border-2 border-brand-500 rounded-full shadow-glow-blue pointer-events-none z-30"
           style={{ left: `calc(${maxPct}% - 8px)` }}
         />
       </div>
 
-      <div className="flex items-center justify-between text-[10px] text-gray-400">
+      <div className="flex items-center justify-between text-[10px] text-slate-500">
         <span>{formatPrice(MIN_PRICE)}</span>
         <span>{formatPrice(MAX_PRICE)}</span>
       </div>

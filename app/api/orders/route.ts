@@ -76,12 +76,12 @@ export async function POST(request: NextRequest) {
     .from("orders")
     .insert([{
       user_id:          user.id,
-      status:           "pending",
-      total:            Math.round(total),
-      shipping_fee:     Math.round(shipping_fee),
-      grand_total:      Math.round(grand_total),
+      status:           "pending" as const,
+      total:            Math.round(total * 100) / 100,
+      shipping_fee:     Math.round(shipping_fee * 100) / 100,
+      grand_total:      Math.round(grand_total * 100) / 100,
       shipping_address,
-      payment_method:   payment_method ?? "cash_on_delivery",
+      payment_method:   (payment_method ?? "cash_on_delivery") as PaymentMethod,
       notes:            notes ?? null,
     }])
     .select()
@@ -99,8 +99,8 @@ export async function POST(request: NextRequest) {
     order_id:   order.id,
     product_id: item.product_id,
     quantity:   item.quantity,
-    price:      Math.round(item.price),
-    line_total: Math.round(item.line_total),
+    price:      Math.round(item.price * 100) / 100,
+    line_total: Math.round(item.line_total * 100) / 100,
   }));
 
   const { error: itemsError } = await supabase

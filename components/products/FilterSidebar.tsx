@@ -17,11 +17,7 @@ const SORT_OPTIONS = [
 
 type SortValue = (typeof SORT_OPTIONS)[number]["value"];
 
-interface FilterSidebarProps {
-  onClose?: () => void;
-}
-
-export default function FilterSidebar({ onClose }: FilterSidebarProps) {
+export default function FilterSidebar({ onClose }: { onClose?: () => void }) {
   const router       = useRouter();
   const pathname     = usePathname();
   const searchParams = useSearchParams();
@@ -55,42 +51,33 @@ export default function FilterSidebar({ onClose }: FilterSidebarProps) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Drawer header (mobile only) */}
+      {/* Mobile drawer header */}
       {onClose && (
-        <div className="flex items-center justify-between pb-4 mb-4 border-b border-gray-100">
-          <h2 className="text-base font-semibold text-gray-900">Filters</h2>
-          <button
-            onClick={onClose}
-            aria-label="Close filters"
-            className="p-1.5 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-          >
+        <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+          <h2 className="text-base font-bold text-slate-900">Filters</h2>
+          <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
       )}
 
-      {/* Desktop heading */}
+      {/* Desktop header */}
       {!onClose && (
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-widest">Filters</h2>
+          <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Filters</h2>
           {hasFilters && (
-            <button
-              onClick={clearAll}
-              className="text-xs text-rwanda-green-700 hover:text-rwanda-green-600 font-medium transition-colors"
-            >
+            <button onClick={clearAll} className="text-xs text-blue-600 hover:text-blue-800 font-semibold transition-colors">
               Clear all
             </button>
           )}
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto space-y-7">
-        {/* Sort by */}
+      <div className="flex-1 overflow-y-auto space-y-6">
+        {/* Sort */}
         <section aria-labelledby="sort-heading">
-          <h3 id="sort-heading" className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-            Sort by
-          </h3>
-          <div className="space-y-1.5">
+          <h3 id="sort-heading" className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5">Sort by</h3>
+          <div className="space-y-1">
             {SORT_OPTIONS.map(({ value, label }) => (
               <button
                 key={value}
@@ -98,8 +85,8 @@ export default function FilterSidebar({ onClose }: FilterSidebarProps) {
                 className={cn(
                   "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors",
                   activeSort === value
-                    ? "bg-rwanda-green-50 text-rwanda-green-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    ? "bg-blue-50 text-blue-700 font-semibold"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                 )}
               >
                 {label}
@@ -108,13 +95,11 @@ export default function FilterSidebar({ onClose }: FilterSidebarProps) {
           </div>
         </section>
 
-        <div className="border-t border-gray-100" />
+        <div className="border-t border-slate-100" />
 
         {/* Categories */}
         <section aria-labelledby="category-heading">
-          <h3 id="category-heading" className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-            Category
-          </h3>
+          <h3 id="category-heading" className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5">Category</h3>
           <div className="space-y-1">
             {CATEGORY_SLUGS.map((slug) => {
               const active = activeCategory === slug;
@@ -123,22 +108,17 @@ export default function FilterSidebar({ onClose }: FilterSidebarProps) {
                   key={slug}
                   className={cn(
                     "flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer select-none transition-colors",
-                    active ? "bg-rwanda-green-50" : "hover:bg-gray-50"
+                    active ? "bg-blue-50" : "hover:bg-slate-50"
                   )}
                 >
                   <input
                     type="checkbox"
                     checked={active}
                     onChange={() => toggleCategory(slug)}
-                    className="w-4 h-4 rounded border-gray-300 text-rwanda-green-600 focus:ring-rwanda-green-500 cursor-pointer"
+                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   />
-                  <span className="text-base leading-none" aria-hidden="true">
-                    {CATEGORY_EMOJIS[slug]}
-                  </span>
-                  <span className={cn(
-                    "text-sm transition-colors",
-                    active ? "text-rwanda-green-700 font-medium" : "text-gray-700"
-                  )}>
+                  <span className="text-base leading-none">{CATEGORY_EMOJIS[slug]}</span>
+                  <span className={cn("text-sm", active ? "text-blue-700 font-semibold" : "text-slate-700")}>
                     {CATEGORY_LABELS[slug]}
                   </span>
                 </label>
@@ -147,26 +127,20 @@ export default function FilterSidebar({ onClose }: FilterSidebarProps) {
           </div>
         </section>
 
-        <div className="border-t border-gray-100" />
+        <div className="border-t border-slate-100" />
 
-        {/* Price range */}
+        {/* Price */}
         <section aria-labelledby="price-heading">
-          <h3 id="price-heading" className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-            Price range (RWF)
-          </h3>
+          <h3 id="price-heading" className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5">Price range (RWF)</h3>
           <PriceRangeSlider />
         </section>
       </div>
 
-      {/* Mobile apply button */}
+      {/* Mobile apply */}
       {onClose && hasFilters && (
-        <div className="mt-6 pt-4 border-t border-gray-100 flex gap-3">
-          <button onClick={clearAll} className="flex-1 btn-secondary py-2.5 text-sm">
-            Clear
-          </button>
-          <button onClick={onClose} className="flex-1 btn-primary py-2.5 text-sm">
-            View results
-          </button>
+        <div className="mt-6 pt-4 border-t border-slate-100 flex gap-3">
+          <button onClick={clearAll} className="flex-1 btn-secondary py-2.5 text-sm">Clear</button>
+          <button onClick={onClose}  className="flex-1 btn-primary py-2.5 text-sm">View results</button>
         </div>
       )}
     </div>

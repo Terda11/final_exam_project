@@ -21,11 +21,11 @@ export default function CartItem({ item }: CartItemProps) {
     : null;
 
   return (
-    <li className="flex gap-4 py-5 border-b border-gray-100 last:border-0 group">
+    <li className="flex gap-4 py-5 border-b border-surface-600 last:border-0 group">
       {/* Image */}
       <Link
         href={`/products/${product.id}`}
-        className="flex-none rounded-xl overflow-hidden bg-rwanda-beige-50"
+        className="flex-none rounded-xl overflow-hidden bg-surface-700"
         tabIndex={-1}
         aria-hidden="true"
       >
@@ -43,18 +43,18 @@ export default function CartItem({ item }: CartItemProps) {
       {/* Info */}
       <div className="flex-1 min-w-0 flex flex-col gap-1.5">
         <Link href={`/products/${product.id}`}>
-          <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 hover:text-rwanda-green-700 transition-colors">
+          <h3 className="text-sm font-semibold text-white line-clamp-2 hover:text-brand-300 transition-colors">
             {product.name}
           </h3>
         </Link>
 
         {categoryLabel && (
-          <p className="text-[10px] font-semibold text-rwanda-green-600 uppercase tracking-widest">
+          <p className="text-[10px] font-bold text-brand-400 uppercase tracking-widest">
             {categoryLabel}
           </p>
         )}
 
-        <p className="text-xs text-gray-400 tabular-nums">
+        <p className="text-xs text-slate-500 tabular-nums">
           {formatPrice(product.price)} / unit
         </p>
 
@@ -64,23 +64,23 @@ export default function CartItem({ item }: CartItemProps) {
           role="group"
           aria-label={`Quantity for ${product.name}`}
         >
-          <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+          <div className="flex items-center border border-surface-500 rounded-lg overflow-hidden">
             <button
               onClick={() => updateItemQuantity(product.id, quantity - 1)}
               disabled={quantity <= 1}
               aria-label="Decrease quantity"
-              className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border-r border-gray-200"
+              className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-surface-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border-r border-surface-500"
             >
               <Minus className="w-3 h-3" />
             </button>
-            <span className="w-10 text-center text-sm font-semibold tabular-nums text-gray-900">
+            <span className="w-10 text-center text-sm font-bold tabular-nums text-white">
               {quantity}
             </span>
             <button
               onClick={() => updateItemQuantity(product.id, quantity + 1)}
               disabled={quantity >= product.stock}
               aria-label="Increase quantity"
-              className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border-l border-gray-200"
+              className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-surface-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors border-l border-surface-500"
             >
               <Plus className="w-3 h-3" />
             </button>
@@ -89,7 +89,7 @@ export default function CartItem({ item }: CartItemProps) {
           <button
             onClick={() => removeFromCart(product.id)}
             aria-label={`Remove ${product.name} from cart`}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+            className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -99,18 +99,18 @@ export default function CartItem({ item }: CartItemProps) {
       {/* Subtotal */}
       <div className="flex-none text-right flex flex-col items-end justify-between py-0.5">
         <p className={cn(
-          "text-base font-bold tabular-nums",
-          product.stock === 0 ? "text-red-500" : "text-gray-900"
+          "text-base font-black tabular-nums",
+          product.stock === 0 ? "text-red-400" : "text-white"
         )}>
           {formatPrice(product.price * quantity)}
         </p>
         {product.stock > 0 && product.stock < 5 && (
-          <p className="text-[10px] text-orange-500 font-medium">
+          <p className="text-[10px] text-orange-400 font-medium">
             {product.stock} left
           </p>
         )}
         {product.stock === 0 && (
-          <p className="text-[10px] text-red-500 font-medium">Sold out</p>
+          <p className="text-[10px] text-red-400 font-medium">Sold out</p>
         )}
       </div>
     </li>

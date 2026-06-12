@@ -85,7 +85,7 @@ Maintain strict TypeScript throughout the entire project (zero use of the `any` 
 | Feature | Description |
 |---|---|
 | **Homepage** | Hero section with call-to-action, featured products grid, category bar, promotional banner |
-| **Product catalogue** | Paginated grid with filtering by category (Vannerie, Sculptures, Textiles, Poterie, Bijoux), price range, and full-text search |
+| **Product catalogue** | Paginated grid with filtering by category (Mobiles & Tablets, Laptops & Computers, Projectors, Audio & Sound, Accessories), price range, and full-text search |
 | **Product detail page** | Image gallery, description, stock indicator, add-to-cart with quantity selector, related products |
 | **Category navigation** | Dropdown menu (desktop) and accordion (mobile drawer) with category icons and slugs |
 | **Responsive design** | Fully responsive layout from 320px (mobile) to 1920px (large desktop) using Tailwind CSS |
@@ -230,7 +230,7 @@ auth.users (Supabase managed)
            │
            ├── public.products  (name, price RWF, stock, category_id FK, image_url, is_active)
            │       │
-           │       └── public.categories  (slug: vannerie|sculptures|textiles|poterie|bijoux)
+           │       └── public.categories  (slug: mobiles-tablets|laptops-computers|projectors|audio-sound|accessories)
            │
            └── public.orders    (status, total, shipping_fee, grand_total, shipping_address JSONB)
                    │
@@ -260,7 +260,7 @@ The following screenshots document the key user-facing screens of RwandaShop. Al
 ---
 
 **[Screenshot 1 — Homepage]**
-*The RwandaShop homepage featuring the hero banner with a call-to-action, the category navigation bar (Vannerie, Sculptures, Textiles, Poterie, Bijoux), and the featured products grid.*
+*The TechShop homepage featuring the hero banner with a call-to-action, the category navigation bar (Mobiles & Tablets, Laptops & Computers, Projectors, Audio & Sound, Accessories), and the featured products grid.*
 
 ---
 

@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS public.categories (
   id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   name        VARCHAR(100) NOT NULL,
   slug        VARCHAR(100) NOT NULL UNIQUE
-                            CHECK (slug IN ('vannerie','sculptures','textiles','poterie','bijoux')),
+                            CHECK (slug IN ('mobiles-tablets','laptops-computers','projectors','audio-sound','accessories')),
   description TEXT,
   image_url   TEXT,
   created_at  TIMESTAMPTZ  NOT NULL DEFAULT now()

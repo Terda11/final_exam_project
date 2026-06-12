@@ -1,79 +1,97 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle } from "lucide-react";
+import { ArrowRight, ShieldCheck, Truck, RotateCcw } from "lucide-react";
 
-const TRUST_SIGNALS = [
-  "500+ local artisans",
-  "Delivery across Rwanda",
-  "MTN MoMo & Airtel payments",
-] as const;
+const QUICK_CATS = [
+  { slug: "mobiles-tablets",   label: "Phones",      emoji: "📱" },
+  { slug: "laptops-computers", label: "Laptops",     emoji: "💻" },
+  { slug: "projectors",        label: "Projectors",  emoji: "📽️" },
+  { slug: "audio-sound",       label: "Audio",       emoji: "🎧" },
+  { slug: "accessories",       label: "Accessories", emoji: "🔌" },
+];
+
+const TRUST = [
+  { icon: Truck,       text: "Free delivery over RWF 500,000" },
+  { icon: ShieldCheck, text: "2-year warranty on all products" },
+  { icon: RotateCcw,   text: "30-day free returns"            },
+];
 
 export default function HeroSection() {
   return (
-    <section
-      className="relative overflow-hidden bg-gradient-to-br from-rwanda-green-900 via-rwanda-green-800 to-rwanda-green-700"
-      aria-label="Welcome to RwandaShop"
-    >
-      {/* Kente pattern overlay */}
-      <div className="absolute inset-0 bg-pattern-kente opacity-[0.07] pointer-events-none" aria-hidden="true" />
+    <section className="relative bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 overflow-hidden">
+      {/* Subtle pattern */}
+      <div
+        className="absolute inset-0 opacity-10 pointer-events-none"
+        style={{
+          backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+          backgroundSize: "32px 32px",
+        }}
+        aria-hidden="true"
+      />
 
-      {/* Ambient glow blobs */}
-      <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-rwanda-sky-700/20 blur-3xl pointer-events-none" aria-hidden="true" />
-      <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-rwanda-gold-500/10 blur-3xl pointer-events-none" aria-hidden="true" />
+      {/* Right decoration circle */}
+      <div className="absolute -right-32 -top-32 w-[500px] h-[500px] rounded-full bg-white/10 pointer-events-none" aria-hidden="true" />
+      <div className="absolute -right-16 -bottom-24 w-80 h-80 rounded-full bg-blue-400/30 pointer-events-none" aria-hidden="true" />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-36">
-        <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
 
-          {/* Badge */}
-          <span className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-rwanda-gold-300 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6 animate-fade-in">
-            <span className="w-1.5 h-1.5 rounded-full bg-rwanda-gold-400 animate-pulse" aria-hidden="true" />
-            Authentic Rwandan crafts
+        {/* ── Main content ─────────────────────────────────── */}
+        <div className="max-w-2xl">
+          <span className="inline-flex items-center gap-2 bg-white/20 text-white text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full mb-5 border border-white/30">
+            🇷🇼 Rwanda&apos;s Electronics Store
           </span>
 
-          {/* Headline */}
-          <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight animate-slide-up">
-            Rwandan crafts,
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.05] tracking-tight">
+            Top Electronics.
             <br />
-            <span className="text-rwanda-gold-400"><em>reinvented</em> for the world</span>
+            <span className="text-blue-100">Best Prices.</span>
           </h1>
 
-          {/* Subtitle */}
-          <p className="mt-6 text-lg sm:text-xl text-rwanda-green-100 max-w-xl leading-relaxed animate-slide-up">
-            Discover unique creations by local artisans — Agaseke bas&shy;ketry, Imigongo sculptures, Kitenge textiles and much more.
-            <br className="hidden sm:block" />
-            Every purchase directly supports a family.
+          <p className="mt-4 text-base sm:text-lg text-blue-100 max-w-lg leading-relaxed">
+            Phones, laptops, projectors, audio gear and accessories — all genuine, all in stock, delivered fast across Rwanda.
           </p>
 
-          {/* CTAs */}
-          <div className="mt-10 flex flex-col sm:flex-row items-center gap-4 animate-slide-up">
+          {/* CTA row */}
+          <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link
               href="/products"
-              className="inline-flex items-center gap-2 bg-rwanda-gold-500 hover:bg-rwanda-gold-400 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-rwanda-gold-500/30 transition-all duration-150 hover:scale-105 active:scale-100"
+              className="inline-flex items-center gap-2 bg-white text-blue-700 font-black px-6 py-3 rounded-xl shadow-lg hover:bg-blue-50 active:scale-[.98] transition-all duration-150 text-sm"
             >
-              Explore products
+              Shop All Products
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              href="/about"
-              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-8 py-3.5 rounded-xl border border-white/20 transition-all duration-150 backdrop-blur-sm"
+              href="/products?category=projectors"
+              className="inline-flex items-center gap-2 bg-blue-800/40 backdrop-blur-sm text-white font-semibold px-6 py-3 rounded-xl border border-white/25 hover:bg-blue-800/60 transition-all duration-150 text-sm"
             >
-              Our story
+              📽️ Shop Projectors
             </Link>
           </div>
-
-          {/* Trust signals */}
-          <ul className="mt-10 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 animate-fade-in">
-            {TRUST_SIGNALS.map((signal) => (
-              <li key={signal} className="flex items-center gap-2 text-sm text-rwanda-green-200">
-                <CheckCircle className="w-4 h-4 text-rwanda-green-400 shrink-0" />
-                {signal}
-              </li>
-            ))}
-          </ul>
         </div>
-      </div>
 
-      {/* Decorative bottom wave */}
-      <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white/10 to-transparent pointer-events-none" aria-hidden="true" />
+        {/* ── Category quick-links ─────────────────────────── */}
+        <div className="mt-12 flex flex-wrap gap-3">
+          {QUICK_CATS.map((cat) => (
+            <Link
+              key={cat.slug}
+              href={`/products?category=${cat.slug}`}
+              className="flex items-center gap-2 bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white text-sm font-semibold px-4 py-2 rounded-full border border-white/20 transition-all duration-150"
+            >
+              <span>{cat.emoji}</span>
+              {cat.label}
+            </Link>
+          ))}
+        </div>
+
+        {/* ── Trust bar ────────────────────────────────────── */}
+        <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2">
+          {TRUST.map(({ icon: Icon, text }) => (
+            <li key={text} className="flex items-center gap-2 text-xs text-blue-100">
+              <Icon className="w-3.5 h-3.5 text-white/70 shrink-0" />
+              {text}
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }

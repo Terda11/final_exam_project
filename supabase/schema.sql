@@ -67,19 +67,19 @@ CREATE TABLE IF NOT EXISTS public.categories (
   id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name        TEXT NOT NULL,
   slug        TEXT NOT NULL UNIQUE
-                CHECK (slug IN ('vannerie','sculptures','textiles','poterie','bijoux')),
+                CHECK (slug IN ('mobiles-tablets','laptops-computers','projectors','audio-sound','accessories')),
   description TEXT,
   image_url   TEXT,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Données de référence (insérées une seule fois)
+-- Reference data (inserted once)
 INSERT INTO public.categories (name, slug, description) VALUES
-  ('Vannerie',   'vannerie',   'Corbeilles, nattes et objets tressés traditionnels'),
-  ('Sculptures', 'sculptures', 'Art en bois, pierre et Imigongo'),
-  ('Textiles',   'textiles',   'Tissus Kitenge, broderies et coutures artisanales'),
-  ('Poterie',    'poterie',    'Céramiques et poteries traditionnelles rwandaises'),
-  ('Bijoux',     'bijoux',     'Bijoux et ornements faits à la main')
+  ('Mobiles & Tablets',   'mobiles-tablets',   'Smartphones, iPhones, Android phones and tablets'),
+  ('Laptops & Computers', 'laptops-computers', 'Laptops, desktops and computing peripherals'),
+  ('Projectors',          'projectors',        'Business and home cinema projectors and screens'),
+  ('Audio & Sound',       'audio-sound',       'Headphones, earbuds, speakers and soundbars'),
+  ('Accessories',         'accessories',       'Cables, chargers, cases and tech peripherals')
 ON CONFLICT (slug) DO NOTHING;
 
 -- ══════════════════════════════════════════════════════════════════
@@ -276,30 +276,5 @@ CREATE POLICY "order_items_insert_auth"
 --  SEED DATA — données de démonstration
 --  Dé-commenter et adapter les UUIDs après avoir créé un compte admin
 -- ══════════════════════════════════════════════════════════════════
-/*
--- 1. Récupérer l'UUID de l'artisan admin :
---    SELECT id FROM public.users WHERE role = 'admin' LIMIT 1;
-
--- 2. Remplacer 'YOUR-ADMIN-UUID' ci-dessous :
-WITH artisan AS (SELECT 'YOUR-ADMIN-UUID'::uuid AS id),
-     cat_van AS (SELECT id FROM public.categories WHERE slug = 'vannerie'),
-     cat_scu AS (SELECT id FROM public.categories WHERE slug = 'sculptures'),
-     cat_tex AS (SELECT id FROM public.categories WHERE slug = 'textiles')
-INSERT INTO public.products (name, description, price, stock, category_id, artisan_id, is_featured, is_active)
-VALUES
-  ('Corbeille Agaseke',
-   'Corbeille traditionnelle rwandaise tressée à la main, motifs géométriques colorés. Diamètre 30cm.',
-   15000, 10, (SELECT id FROM cat_van), (SELECT id FROM artisan), true, true),
-  ('Panneau Imigongo',
-   'Art mural traditionnel du Rwanda, motifs géométriques en relief peints en noir, blanc et rouge.',
-   45000, 5, (SELECT id FROM cat_scu), (SELECT id FROM artisan), true, true),
-  ('Tissu Kitenge 2m',
-   'Tissu coloré aux motifs africains traditionnels, 100% coton, 2 mètres de longueur.',
-   8000, 20, (SELECT id FROM cat_tex), (SELECT id FROM artisan), false, true),
-  ('Set de 3 corbeilles',
-   'Ensemble de trois corbeilles Agaseke de tailles différentes, idéal comme décoration.',
-   35000, 7, (SELECT id FROM cat_van), (SELECT id FROM artisan), true, true),
-  ('Sculpture en bois d''ébène',
-   'Sculpture artisanale représentant un guerrier rwandais, bois d''ébène massif, hauteur 40cm.',
-   60000, 3, (SELECT id FROM cat_scu), (SELECT id FROM artisan), false, true);
-*/
+-- Use database/seed.sql to insert electronics products.
+-- ══════════════════════════════════════════════════════════════════

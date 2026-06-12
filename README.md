@@ -1,6 +1,6 @@
-# RwandaShop
+# TechShop Rwanda
 
-Plateforme e-commerce pour la vente d'artisanat rwandais authentique — vannerie, sculptures, textiles, poterie et bijoux — développée dans le cadre du projet UNILAK.
+Electronics e-commerce platform for Rwanda — smartphones, laptops, projectors, audio gear and accessories.
 
 ## Stack technique
 

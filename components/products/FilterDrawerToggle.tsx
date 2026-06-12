@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import FilterSidebar from "./FilterSidebar";
 import { cn } from "@/lib/utils";
@@ -10,12 +10,8 @@ export default function FilterDrawerToggle() {
   const [open, setOpen] = useState(false);
   const searchParams = useSearchParams();
 
-  // Close on route change
-  useEffect(() => {
-    setOpen(false);
-  }, [searchParams]);
+  useEffect(() => { setOpen(false); }, [searchParams]);
 
-  // Body scroll lock
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -30,39 +26,36 @@ export default function FilterDrawerToggle() {
 
   return (
     <>
-      {/* Toggle button */}
       <button
         onClick={() => setOpen(true)}
-        className="lg:hidden flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:border-rwanda-green-400 hover:text-rwanda-green-700 transition-colors"
-        aria-label="Ouvrir les filtres"
+        className="lg:hidden flex items-center gap-2 px-4 py-2.5 rounded-xl border border-surface-500 text-sm font-medium text-slate-300 hover:border-brand-500 hover:text-brand-400 transition-colors"
+        aria-label="Open filters"
         aria-expanded={open}
       >
         <SlidersHorizontal className="w-4 h-4" />
-        Filtres
+        Filters
         {activeCount > 0 && (
-          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-rwanda-green-600 text-white text-[10px] font-bold">
+          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-brand-600 text-white text-[10px] font-bold">
             {activeCount}
           </span>
         )}
       </button>
 
-      {/* Overlay */}
       <div
         onClick={() => setOpen(false)}
         aria-hidden="true"
         className={cn(
-          "fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden",
+          "fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden",
           "transition-opacity duration-300",
           open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         )}
       />
 
-      {/* Drawer panel */}
       <aside
-        aria-label="Filtres produits"
+        aria-label="Product filters"
         aria-hidden={!open}
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-80 bg-white shadow-2xl lg:hidden",
+          "fixed inset-y-0 left-0 z-50 w-80 bg-surface-800 border-r border-surface-600 shadow-2xl lg:hidden",
           "flex flex-col p-5",
           "transition-transform duration-300 ease-out",
           open ? "translate-x-0" : "-translate-x-full"

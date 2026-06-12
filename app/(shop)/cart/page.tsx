@@ -9,12 +9,12 @@ import { useCart } from "@/lib/hooks/useCart";
 function EmptyCart() {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center px-4">
-      <div className="flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 mb-6">
-        <ShoppingBag className="w-10 h-10 text-gray-400" aria-hidden="true" />
+      <div className="flex items-center justify-center w-20 h-20 rounded-full bg-surface-700 border border-surface-600 mb-6">
+        <ShoppingBag className="w-10 h-10 text-slate-400" aria-hidden="true" />
       </div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h1>
-      <p className="text-gray-500 max-w-sm mb-8 text-sm">
-        You haven&apos;t added any products yet. Browse our selection of authentic Rwandan crafts.
+      <h1 className="text-2xl font-black text-white mb-2">Your cart is empty</h1>
+      <p className="text-slate-400 max-w-sm mb-8 text-sm">
+        You haven&apos;t added any products yet. Browse our latest electronics.
       </p>
       <Link href="/products" className="inline-flex items-center gap-2 btn-primary px-6 py-3">
         Explore products
@@ -40,14 +40,14 @@ export default function CartPage() {
 
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-serif text-3xl font-bold text-gray-900">My cart</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="font-sans text-3xl font-black text-white">My cart</h1>
+          <p className="mt-1 text-sm text-slate-400">
             {itemCount} item{itemCount > 1 ? "s" : ""}
           </p>
         </div>
         <button
           onClick={clearCart}
-          className="hidden sm:flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-500 transition-colors"
+          className="hidden sm:flex items-center gap-1.5 text-sm text-slate-400 hover:text-red-400 transition-colors"
           aria-label="Clear cart"
         >
           <Trash2 className="w-4 h-4" />
@@ -64,7 +64,7 @@ export default function CartPage() {
           </ul>
           <button
             onClick={clearCart}
-            className="sm:hidden mt-4 flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-500 transition-colors"
+            className="sm:hidden mt-4 flex items-center gap-1.5 text-sm text-slate-400 hover:text-red-400 transition-colors"
             aria-label="Clear cart"
           >
             <Trash2 className="w-4 h-4" />

@@ -14,39 +14,39 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
-const SITE_NAME = "RwandaShop";
-const SITE_URL  = process.env.NEXT_PUBLIC_SITE_URL ?? "https://rwandashop.rw";
+const SITE_NAME = "TechShop";
+const SITE_URL  = process.env.NEXT_PUBLIC_SITE_URL ?? "https://techshop.io";
 const SITE_DESC =
-  "Discover and buy authentic Rwandan crafts: Agaseke basketry, Imigongo sculptures, Kitenge textiles and jewellery. Delivery across Rwanda. Every purchase directly supports local artisans.";
+  "Shop the latest smartphones, laptops, audio gear, gaming consoles, and accessories. Genuine products, fast delivery, and 2-year warranty. Secure mock checkout for demos.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
 
   title: {
-    default:  `${SITE_NAME} — Authentic Rwandan Crafts`,
+    default:  `${SITE_NAME} — Premium Electronics`,
     template: `%s | ${SITE_NAME}`,
   },
 
   description: SITE_DESC,
 
   keywords: [
-    "Rwandan crafts",
-    "Rwanda",
-    "Rwanda marketplace",
-    "basketry",
-    "Agaseke",
-    "Imigongo",
-    "Kitenge",
-    "Rwanda sculptures",
-    "Rwanda jewellery",
-    "local artisans",
-    "Rwanda e-commerce",
-    "UNILAK",
+    "electronics",
+    "smartphones",
+    "laptops",
+    "gaming",
+    "audio",
+    "headphones",
+    "iPhone",
+    "MacBook",
+    "Samsung",
+    "Sony",
+    "PlayStation",
+    "tech accessories",
   ],
 
-  authors:   [{ name: "RwandaShop", url: SITE_URL }],
-  creator:   "RwandaShop — UNILAK",
-  publisher: "RwandaShop",
+  authors:   [{ name: "TechShop", url: SITE_URL }],
+  creator:   "TechShop",
+  publisher: "TechShop",
   category:  "marketplace",
 
   robots: {
@@ -62,68 +62,33 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    type:            "website",
-    locale:          "en_RW",
-    alternateLocale: ["fr_RW"],
-    url:             SITE_URL,
-    siteName:        SITE_NAME,
-    title:           `${SITE_NAME} — Authentic Rwandan Crafts`,
-    description:     SITE_DESC,
-    images: [
-      {
-        url:    "/og-image.jpg",
-        width:  1200,
-        height: 630,
-        alt:    "RwandaShop — Rwandan Crafts",
-        type:   "image/jpeg",
-      },
-    ],
+    type:     "website",
+    locale:   "en_US",
+    url:      SITE_URL,
+    siteName: SITE_NAME,
+    title:    `${SITE_NAME} — Premium Electronics`,
+    description: SITE_DESC,
   },
 
   twitter: {
-    card:        "summary_large_image",
-    site:        "@rwandashop",
-    creator:     "@rwandashop",
-    title:       `${SITE_NAME} — Authentic Rwandan Crafts`,
+    card:    "summary_large_image",
+    site:    "@techshop",
+    creator: "@techshop",
+    title:   `${SITE_NAME} — Premium Electronics`,
     description: SITE_DESC,
-    images:      ["/og-image.jpg"],
   },
 
   icons: {
-    icon: [
-      { url: "/favicon.ico",  sizes: "any" },
-      { url: "/icon.svg",     type: "image/svg+xml" },
-      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
-      { url: "/icon-512.png", type: "image/png", sizes: "512x512" },
-    ],
+    icon:    [{ url: "/favicon.ico", sizes: "any" }],
     apple:   [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
     shortcut: "/favicon.ico",
   },
 
-  manifest: "/manifest.json",
-
-  alternates: {
-    canonical: SITE_URL,
-    languages: {
-      "en-RW": SITE_URL,
-      "fr-RW": `${SITE_URL}/fr`,
-    },
-  },
-
-  verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? "",
-  },
-
   applicationName: SITE_NAME,
   appleWebApp: {
-    capable:         true,
-    title:           SITE_NAME,
-    statusBarStyle:  "default",
-  },
-  formatDetection: {
-    telephone: true,
-    email:     true,
-    address:   false,
+    capable:        true,
+    title:          SITE_NAME,
+    statusBarStyle: "black-translucent",
   },
 };
 
@@ -133,10 +98,10 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#0f6138" },
-    { media: "(prefers-color-scheme: dark)",  color: "#0d4f2f" },
+    { media: "(prefers-color-scheme: light)", color: "#1d4ed8" },
+    { media: "(prefers-color-scheme: dark)",  color: "#0a0f1e" },
   ],
-  colorScheme: "light dark",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -146,7 +111,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${inter.variable} ${playfair.variable}`}
       suppressHydrationWarning
     >
-      <body className="font-sans bg-white text-gray-900 antialiased">
+      <body className="font-sans bg-slate-50 text-slate-900 antialiased">
         {children}
       </body>
     </html>

@@ -15,9 +15,9 @@ export type Json =
 // ── Enums partagés ────────────────────────────────────────────────
 
 type UserRole       = "customer" | "admin";
-type CategorySlug   = "vannerie" | "sculptures" | "textiles" | "poterie" | "bijoux";
+type CategorySlug   = "mobiles-tablets" | "laptops-computers" | "projectors" | "audio-sound" | "accessories";
 type OrderStatus    = "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
-type PaymentMethod  = "cash_on_delivery" | "mtn_momo" | "airtel_money";
+type PaymentMethod  = "credit_card" | "cash_on_delivery" | "mtn_momo" | "airtel_money";
 type Province       = "Kigali" | "Nord" | "Sud" | "Est" | "Ouest";
 
 // ── Shipping address JSON shape ───────────────────────────────────
