@@ -5,9 +5,9 @@ import { Truck, Tag } from "lucide-react";
 import { useCart } from "@/lib/hooks/useCart";
 import { formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { SHIPPING_FEE, SHIPPING_THRESHOLD } from "@/lib/constants/shipping";
 
-export const SHIPPING_THRESHOLD = 500000;   // RWF 500,000 → free shipping
-export const SHIPPING_FEE       = 5000;     // RWF 5,000 delivery fee
+export { SHIPPING_FEE, SHIPPING_THRESHOLD };
 
 export default function CartSummary() {
   const { total, itemCount } = useCart();

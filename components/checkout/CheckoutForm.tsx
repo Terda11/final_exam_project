@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useCart } from "@/lib/hooks/useCart";
 import { cn, formatCardNumber, formatExpiry, formatPrice } from "@/lib/utils";
-import { SHIPPING_FEE, SHIPPING_THRESHOLD } from "@/components/cart/CartSummary";
+import { SHIPPING_FEE, SHIPPING_THRESHOLD } from "@/lib/constants/shipping";
 
 const CITIES = ["Kigali", "Gisenyi", "Huye", "Musanze", "Butare"] as const;
 
@@ -22,7 +22,7 @@ const baseSchema = z.object({
   address_line1:  z.string().min(4, "Address required (min 4 chars)"),
   city:           z.enum(CITIES, { errorMap: () => ({ message: "Select a city" }) }),
   notes:          z.string().max(300, "Max 300 characters").optional(),
-  payment_method: z.enum(["credit_card", "cash_on_delivery"] as const),
+  payment_method: z.enum(["credit_card", "cash_on_delivery", "mtn_momo", "airtel_money"] as const),
 });
 
 const creditCardSchema = z.object({
@@ -441,6 +441,48 @@ export default function CheckoutForm() {
               <p className="text-sm font-semibold text-white">Cash on delivery</p>
               <p className="text-xs text-slate-400 mt-0.5">Pay when your order arrives</p>
             </div>
+          </label>
+
+          {/* MTN Mobile Money */}
+          <label className={cn(
+            "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+            form.payment_method === "mtn_momo"
+              ? "border-brand-500 bg-brand-500/10"
+              : "border-surface-500 hover:border-surface-400"
+          )}>
+            <input
+              type="radio" name="payment_method" value="mtn_momo"
+              checked={form.payment_method === "mtn_momo"}
+              onChange={handleChange}
+              className="w-4 h-4 text-brand-500 focus:ring-brand-500 border-surface-400 bg-surface-700"
+            />
+            <Phone className="w-5 h-5 text-yellow-400 shrink-0" aria-hidden="true" />
+            <div>
+              <p className="text-sm font-semibold text-white">MTN Mobile Money</p>
+              <p className="text-xs text-slate-400 mt-0.5">Pay with your MTN MoMo wallet</p>
+            </div>
+            <span className="px-2 py-0.5 rounded text-[10px] font-black bg-yellow-400 text-yellow-900">MTN</span>
+          </label>
+
+          {/* Airtel Money */}
+          <label className={cn(
+            "flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all",
+            form.payment_method === "airtel_money"
+              ? "border-brand-500 bg-brand-500/10"
+              : "border-surface-500 hover:border-surface-400"
+          )}>
+            <input
+              type="radio" name="payment_method" value="airtel_money"
+              checked={form.payment_method === "airtel_money"}
+              onChange={handleChange}
+              className="w-4 h-4 text-brand-500 focus:ring-brand-500 border-surface-400 bg-surface-700"
+            />
+            <Phone className="w-5 h-5 text-red-400 shrink-0" aria-hidden="true" />
+            <div>
+              <p className="text-sm font-semibold text-white">Airtel Money</p>
+              <p className="text-xs text-slate-400 mt-0.5">Pay with your Airtel Money wallet</p>
+            </div>
+            <span className="px-2 py-0.5 rounded text-[10px] font-black bg-red-500 text-white">Airtel</span>
           </label>
         </div>
 

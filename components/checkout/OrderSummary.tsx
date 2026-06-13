@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useCart } from "@/lib/hooks/useCart";
 import { formatPrice, getImageUrl } from "@/lib/utils";
-import { SHIPPING_FEE, SHIPPING_THRESHOLD } from "@/components/cart/CartSummary";
+import { SHIPPING_FEE, SHIPPING_THRESHOLD } from "@/lib/constants/shipping";
 import { cn } from "@/lib/utils";
 
 export default function OrderSummary() {

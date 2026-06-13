@@ -9,7 +9,7 @@ import {
 import { createClient }  from "@/lib/supabase/server";
 import ConfettiCanvas    from "@/components/order/ConfettiCanvas";
 import { formatPrice, getImageUrl } from "@/lib/utils";
-import { ORDER_STATUS_LABELS }      from "@/types";
+import { ORDER_STATUS_LABELS, PAYMENT_METHOD_LABELS } from "@/types";
 import type { Order }               from "@/types";
 
 export const metadata: Metadata = {
@@ -139,10 +139,9 @@ export default async function OrderConfirmationPage({ searchParams }: PageProps)
     ?? order.status;
 
   const paymentLabel = order.payment_method === "credit_card"
-    ? "Credit / Debit card (simulated)"
-    : order.payment_method === "cash_on_delivery"
-    ? "Cash on delivery"
-    : order.payment_method;
+    ? `${PAYMENT_METHOD_LABELS.credit_card} (simulated)`
+    : PAYMENT_METHOD_LABELS[order.payment_method as keyof typeof PAYMENT_METHOD_LABELS]
+      ?? order.payment_method;
 
   return (
     <>

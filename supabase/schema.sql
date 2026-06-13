@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
   -- Adresse de livraison snapshot (JSONB)
   shipping_address JSONB NOT NULL,
   payment_method   TEXT NOT NULL DEFAULT 'cash_on_delivery'
-                     CHECK (payment_method IN ('cash_on_delivery','mtn_momo','airtel_money')),
+                     CHECK (payment_method IN ('credit_card','cash_on_delivery','mtn_momo','airtel_money')),
   notes            TEXT,
   created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()

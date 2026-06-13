@@ -165,6 +165,13 @@ export type PaymentMethod =
   | "mtn_momo"
   | "airtel_money";
 
+export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+  credit_card:      "Credit / Debit card",
+  cash_on_delivery: "Cash on delivery",
+  mtn_momo:         "MTN Mobile Money",
+  airtel_money:     "Airtel Money",
+};
+
 export interface Order {
   id:               UUID;
   user_id:          UUID;

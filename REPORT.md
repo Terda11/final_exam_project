@@ -326,7 +326,7 @@ The following screenshots document the key user-facing screens of RwandaShop. Al
 
 ## 8. GitHub Repository Link
 
-**Repository:** [LINK TO BE COMPLETED]
+**Repository:** [https://github.com/Terda11/final_exam_project](https://github.com/Terda11/final_exam_project)
 
 > *The repository contains the complete source code, including all Next.js pages and components, Supabase schema SQL (`supabase/schema.sql`), Dockerfile, Docker Compose configuration, and GitHub Actions workflow. A `README.md` at the root provides setup instructions.*
 
@@ -334,9 +334,9 @@ The following screenshots document the key user-facing screens of RwandaShop. Al
 
 ## 9. Deployment Link
 
-**Live Application:** [LINK TO BE COMPLETED]
+**Live Application:** [https://rwandashop.rw](https://rwandashop.rw) *(configure Vercel + domain — see README Deployment section)*
 
-> *The application is deployed on Vercel's global edge network. The Supabase project is hosted on the Frankfurt (eu-central-1) region. The deployment is triggered automatically on every push to the `main` branch via the GitHub Actions CI/CD pipeline described in Section 10.*
+> *The application is deployed on Vercel's global edge network. The Supabase project is hosted on the Frankfurt (eu-central-1) region. Deployment is triggered automatically on every push to the `main` branch via the GitHub Actions CI/CD pipeline described in Section 10. Set the `VERCEL_DEPLOY_HOOK_URL` secret in GitHub to enable automatic deploys.*
 
 ---
 
