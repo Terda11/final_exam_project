@@ -293,7 +293,7 @@ export default function CheckoutForm() {
 
       const order = await res.json() as { id: string };
       clearCart();
-      router.push(`/order-confirmation?id=${order.id}`);
+      window.location.href = `/order-confirmation?id=${order.id}`;
     } catch (err) {
       setMockProcessing("idle");
       setServerError(
