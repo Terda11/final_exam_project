@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
+import type { CategorySlug } from "@/types";
 
-const CATEGORIES = [
+const CATEGORIES: { id: string; name: string; slug: CategorySlug }[] = [
   { id: "c1000000-0000-0000-0000-000000000001", name: "Mobiles & Tablets", slug: "mobiles-tablets" },
   { id: "c1000000-0000-0000-0000-000000000002", name: "Laptops & Computers", slug: "laptops-computers" },
   { id: "c1000000-0000-0000-0000-000000000003", name: "Projectors", slug: "projectors" },
@@ -49,24 +50,9 @@ export async function GET() {
     role:      "admin",
   }, { onConflict: "id" });
 
-  // 2. Drop old CHECK constraint and replace categories with electronics ones
-  // Remove the slug CHECK constraint so we can insert electronics categories
-  await adminSupabase.rpc("exec_sql", {
-    query: "ALTER TABLE public.categories DROP CONSTRAINT IF EXISTS categories_slug_check",
-  }).then(() => {}, () => {});
-
-  // Also try raw SQL via REST if rpc not available
-  await adminSupabase.from("categories").delete().not("slug", "in", `(${CATEGORIES.map(c => `"${c.slug}"`).join(",")})`);
-
-  // Delete old categories that don't match electronics slugs
-  const oldSlugs = ["vannerie", "sculptures", "textiles", "poterie", "bijoux"];
-  for (const slug of oldSlugs) {
-    await adminSupabase.from("categories").delete().eq("slug", slug);
-  }
-
-  // Insert electronics categories
+  // 2. Insert electronics categories (skip errors — may already exist)
   for (const cat of CATEGORIES) {
-    await adminSupabase.from("categories").upsert(cat, { onConflict: "id" }).select().maybeSingle();
+    await adminSupabase.from("categories").upsert(cat as never, { onConflict: "id" });
   }
 
   // Fetch all category IDs
@@ -78,7 +64,7 @@ export async function GET() {
     return NextResponse.json({ message: "No categories in DB after seed. You need to drop the CHECK constraint manually. Run this in Supabase SQL Editor: ALTER TABLE public.categories DROP CONSTRAINT IF EXISTS categories_slug_check;" }, { status: 500 });
   }
 
-  const catMap = new Map(allCats.map((c) => [c.slug, c.id as string]));
+  const catMap = new Map(allCats.map((c) => [c.slug as string, c.id as string]));
   const catDebug = Object.fromEntries(catMap);
 
   // 3. Upsert products (use current user as artisan, map to real category IDs)
@@ -107,7 +93,7 @@ export async function GET() {
   for (const prod of productsWithArtisan) {
     const { error: prodError } = await adminSupabase
       .from("products")
-      .upsert(prod, { onConflict: "id" });
+      .upsert(prod as never, { onConflict: "id" });
 
     if (prodError) {
       // If category_id not found, skip this product
