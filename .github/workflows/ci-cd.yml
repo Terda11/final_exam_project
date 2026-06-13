@@ -130,8 +130,8 @@ jobs:
     needs: lint-and-test
     continue-on-error: true
 
-    # Ne s'exécute que sur la branche main (pas sur develop, pas sur les PRs)
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    # Désactivé — le push ghcr.io échoue sur permission. Déploiement via Vercel.
+    if: false
 
     # Permission d'écriture sur le Container Registry
     permissions:
