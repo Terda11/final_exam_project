@@ -288,94 +288,24 @@ export async function POST(request: NextRequest) {
   }
 
   // ── 2. Create order items ─────────────────────────────────────
-  // First try to resolve product IDs using the user's client (RLS-safe)
-  // Only fall back to admin client for advanced operations
-  const resolvedItems = await Promise.all(items.map(async (item) => {
-    // Try resolving with user client first (products table has RLS read access)
-    const { data: productExists } = await supabase
-      .from("products")
-      .select("id")
-      .eq("id", item.product_id)
-      .single();
-
-    if (productExists?.id) {
-      return {
-        order_id:   order.id,
-        product_id: productExists.id,
-        quantity:   item.quantity,
-        price:      Math.round(item.price * 100) / 100,
-        line_total: Math.round(item.line_total * 100) / 100,
-      };
-    }
-
-    // Try admin client as fallback for legacy IDs or product creation
-    try {
-      const adminSupabase = await createAdminClient();
-      const resolvedProductId = await resolveProductId(adminSupabase, item.product_id);
-      if (resolvedProductId) {
-        return {
-          order_id:   order.id,
-          product_id: resolvedProductId,
-          quantity:   item.quantity,
-          price:      Math.round(item.price * 100) / 100,
-          line_total: Math.round(item.line_total * 100) / 100,
-        };
-      }
-
-      if (item.product) {
-        const productId = await findOrCreateProduct(adminSupabase, item.product, user.id);
-        if (productId) {
-          return {
-            order_id:   order.id,
-            product_id: productId,
-            quantity:   item.quantity,
-            price:      Math.round(item.price * 100) / 100,
-            line_total: Math.round(item.line_total * 100) / 100,
-          };
-        }
-      }
-    } catch {
-      // Admin client not available — use product_id as-is if it's a valid UUID
-      if (isValidUuid(item.product_id)) {
-        return {
-          order_id:   order.id,
-          product_id: item.product_id,
-          quantity:   item.quantity,
-          price:      Math.round(item.price * 100) / 100,
-          line_total: Math.round(item.line_total * 100) / 100,
-        };
-      }
-    }
-
+  // Use product_id directly if it's a valid UUID. The DB FK constraint on
+  // order_items.product_id will reject invalid references at insert time.
+  const resolvedItems = items.map((item) => {
+    const pid = item.product_id;
     return {
       order_id:   order.id,
-      product_id: "",
+      product_id: isValidUuid(pid) ? pid : "",
       quantity:   item.quantity,
       price:      Math.round(item.price * 100) / 100,
       line_total: Math.round(item.line_total * 100) / 100,
     };
-  }));
+  });
 
   const invalidItemIndex = resolvedItems.findIndex((item) => !item.product_id);
   if (invalidItemIndex !== -1) {
-    const rawItem = items[invalidItemIndex];
     await supabase.from("orders").delete().eq("id", order.id);
-    console.error("Order creation: invalid product", { index: invalidItemIndex, item: rawItem, resolved: resolvedItems[invalidItemIndex] });
     return NextResponse.json(
-      {
-        message: "Invalid product in cart",
-        invalid_index: invalidItemIndex,
-        product_id: rawItem?.product_id ?? null,
-        has_product_obj: Boolean(rawItem?.product),
-        product: rawItem?.product
-          ? {
-              id: rawItem.product.id,
-              name: rawItem.product.name,
-              category_id: rawItem.product.category_id,
-              artisan_id: rawItem.product.artisan_id,
-            }
-          : null,
-      },
+      { message: "Invalid product ID format in cart. Please clear your cart and try again." },
       { status: 400 }
     );
   }
