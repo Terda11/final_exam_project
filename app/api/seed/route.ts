@@ -49,21 +49,41 @@ export async function GET() {
     role:      "admin",
   }, { onConflict: "id" });
 
-  // 2. Upsert categories
+  // 2. Upsert categories (slug is unique, use it as conflict target)
   const { error: catError } = await adminSupabase
     .from("categories")
-    .upsert(CATEGORIES, { onConflict: "id" });
+    .upsert(CATEGORIES, { onConflict: "slug", ignoreDuplicates: true });
 
   if (catError) {
     return NextResponse.json({ message: "Category insert failed", error: catError.message }, { status: 500 });
   }
 
-  // 3. Upsert products (use current user as artisan)
-  const productsWithArtisan = PRODUCTS.map((p) => ({
-    ...p,
-    artisan_id: user.id,
-    is_active:  true,
-  }));
+  // Re-fetch actual category IDs (may differ from seed if already existed)
+  const { data: dbCats } = await adminSupabase
+    .from("categories")
+    .select("id, slug");
+
+  const catMap = new Map((dbCats ?? []).map((c) => [c.slug, c.id]));
+
+  // 3. Upsert products (use current user as artisan, map to real category IDs)
+  const seedCatToSlug: Record<string, string> = {
+    "c1000000-0000-0000-0000-000000000001": "mobiles-tablets",
+    "c1000000-0000-0000-0000-000000000002": "laptops-computers",
+    "c1000000-0000-0000-0000-000000000003": "projectors",
+    "c1000000-0000-0000-0000-000000000004": "audio-sound",
+    "c1000000-0000-0000-0000-000000000005": "accessories",
+  };
+
+  const productsWithArtisan = PRODUCTS.map((p) => {
+    const slug = seedCatToSlug[p.category_id] ?? "";
+    const realCatId = catMap.get(slug) ?? p.category_id;
+    return {
+      ...p,
+      category_id: realCatId,
+      artisan_id:  user.id,
+      is_active:   true,
+    };
+  });
 
   const { error: prodError } = await adminSupabase
     .from("products")
