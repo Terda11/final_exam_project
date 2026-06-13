@@ -49,21 +49,30 @@ export async function GET() {
     role:      "admin",
   }, { onConflict: "id" });
 
-  // 2. Upsert categories (slug is unique, use it as conflict target)
-  const { error: catError } = await adminSupabase
-    .from("categories")
-    .upsert(CATEGORIES, { onConflict: "slug", ignoreDuplicates: true });
-
-  if (catError) {
-    return NextResponse.json({ message: "Category insert failed", error: catError.message }, { status: 500 });
-  }
-
-  // Re-fetch actual category IDs (may differ from seed if already existed)
+  // 2. Check existing categories first, only insert missing ones
   const { data: dbCats } = await adminSupabase
     .from("categories")
     .select("id, slug");
 
-  const catMap = new Map((dbCats ?? []).map((c) => [c.slug, c.id]));
+  const existingSlugs = new Set((dbCats ?? []).map((c) => c.slug));
+  const missingCats = CATEGORIES.filter((c) => !existingSlugs.has(c.slug));
+
+  if (missingCats.length > 0) {
+    const { error: catError } = await adminSupabase
+      .from("categories")
+      .insert(missingCats);
+
+    if (catError) {
+      return NextResponse.json({ message: "Category insert failed", error: catError.message }, { status: 500 });
+    }
+  }
+
+  // Re-fetch all category IDs
+  const { data: allCats } = await adminSupabase
+    .from("categories")
+    .select("id, slug");
+
+  const catMap = new Map((allCats ?? []).map((c) => [c.slug, c.id]));
 
   // 3. Upsert products (use current user as artisan, map to real category IDs)
   const seedCatToSlug: Record<string, string> = {
