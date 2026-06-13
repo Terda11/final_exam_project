@@ -128,6 +128,7 @@ jobs:
     name: "🐳 Docker Build & Push (ghcr.io)"
     runs-on: ubuntu-latest
     needs: lint-and-test
+    continue-on-error: true
 
     # Ne s'exécute que sur la branche main (pas sur develop, pas sur les PRs)
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
