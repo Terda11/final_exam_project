@@ -77,9 +77,9 @@ function AuthenticatedMenu({ user }: { user: AppUser }) {
   const handleSignOut = async () => {
     setPending(true);
     setOpen(false);
-    await signOut();
-    // Full reload so server clears session cookie before any component re-renders
-    window.location.href = "/";
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    window.location.replace("/");
   };
 
   const menuItems = [
@@ -187,23 +187,24 @@ function GuestButtons() {
       <Link
         href="/login"
         className={cn(
-          "hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg",
+          "flex items-center gap-1.5 px-3 py-1.5 rounded-lg",
           "text-sm font-medium transition-colors duration-150",
           "text-slate-600 hover:text-blue-700 hover:bg-blue-50"
         )}
       >
         <User className="w-4 h-4" />
-        <span className="hidden lg:inline">Sign in</span>
+        <span className="hidden sm:inline">Sign in</span>
       </Link>
       <Link
         href="/register"
         className={cn(
-          "hidden sm:inline-flex items-center px-3 py-1.5 rounded-lg",
+          "flex items-center px-3 py-1.5 rounded-lg",
           "text-sm font-medium transition-colors duration-150",
           "bg-blue-600 text-white hover:bg-blue-700"
         )}
       >
-        Register
+        <span className="hidden sm:inline">Register</span>
+        <User className="w-4 h-4 sm:hidden" />
       </Link>
     </div>
   );
@@ -253,29 +254,21 @@ export default function UserMenu() {
       updated_at: authUser.updated_at ?? authUser.created_at,
     });
 
-    // Initial load
-    const loadUser = async () => {
-      try {
-        const { data: { user: authUser } } = await supabase.auth.getUser();
-        if (!authUser) { setUser(null); setLoading(false); return; }
-        const profile = await fetchProfile(authUser.id);
-        setUser(profile ?? buildFallback(authUser));
-      } catch {
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    void loadUser();
-
-    // Listen for auth state changes
+    // onAuthStateChange fires INITIAL_SESSION on mount — covers initial load + all changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (!session?.user || event === "SIGNED_OUT") { setUser(null); return; }
-        if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
+        if (!session?.user || event === "SIGNED_OUT") {
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+        try {
           const profile = await fetchProfile(session.user.id);
           setUser(profile ?? buildFallback(session.user));
+        } catch {
+          setUser(buildFallback(session.user));
+        } finally {
+          setLoading(false);
         }
       }
     );
@@ -283,15 +276,8 @@ export default function UserMenu() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Skeleton during initial load
   if (loading) {
-    return (
-      <div
-        className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"
-        aria-label="Loading account…"
-        aria-busy="true"
-      />
-    );
+    return <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse shrink-0" />;
   }
 
   if (user) return <AuthenticatedMenu user={user} />;
