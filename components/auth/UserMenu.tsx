@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { signOut } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
 import type { User as AppUser } from "@/types";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 // ── Avatar ────────────────────────────────────────────────────────
 
@@ -234,12 +235,27 @@ export default function UserMenu() {
         : null;
     };
 
+    const buildFallback = (authUser: SupabaseUser): AppUser => ({
+      id:         authUser.id,
+      email:      authUser.email ?? "",
+      full_name:  (authUser.user_metadata?.full_name as string | undefined)
+                    ?? authUser.email?.split("@")[0]
+                    ?? "User",
+      phone:      null,
+      address:    null,
+      role:       "customer",
+      avatar_url: (authUser.user_metadata?.avatar_url as string | undefined) ?? null,
+      created_at: authUser.created_at,
+      updated_at: authUser.updated_at ?? authUser.created_at,
+    });
+
     // Initial load
     const loadUser = async () => {
       try {
         const { data: { user: authUser } } = await supabase.auth.getUser();
         if (!authUser) { setUser(null); setLoading(false); return; }
-        setUser(await fetchProfile(authUser.id));
+        const profile = await fetchProfile(authUser.id);
+        setUser(profile ?? buildFallback(authUser));
       } catch {
         setUser(null);
       } finally {
@@ -254,7 +270,8 @@ export default function UserMenu() {
       async (event, session) => {
         if (!session?.user || event === "SIGNED_OUT") { setUser(null); return; }
         if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED") {
-          setUser(await fetchProfile(session.user.id));
+          const profile = await fetchProfile(session.user.id);
+          setUser(profile ?? buildFallback(session.user));
         }
       }
     );
