@@ -5,21 +5,28 @@ import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart, Check, Heart, Star, Eye } from "lucide-react";
 import { useCart } from "@/lib/hooks/useCart";
+import { createClient } from "@/lib/supabase/client";
 import { formatPrice, getImageUrl, cn } from "@/lib/utils";
 import { CATEGORY_LABELS } from "@/types";
 import type { Product } from "@/types";
+import AuthGateModal from "@/components/auth/AuthGateModal";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
   const [added, setAdded] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
+  const [authGateOpen, setAuthGateOpen] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 
-  function handleAddToCart(e: React.MouseEvent) {
+  async function handleAddToCart(e: React.MouseEvent) {
     e.preventDefault();
     if (product.stock === 0 || added) return;
+
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setAuthGateOpen(true); return; }
 
     setAdded(true);
     addToCart(product, 1);
@@ -33,6 +40,11 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <>
+    <AuthGateModal
+      open={authGateOpen}
+      onClose={() => setAuthGateOpen(false)}
+      productName={product.name}
+    />
     <article className={cn(
       "group relative flex h-full flex-col overflow-hidden rounded-xl",
       "border-2 border-blue-100 bg-white/90 backdrop-blur-sm shadow-card",

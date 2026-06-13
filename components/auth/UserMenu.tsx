@@ -127,7 +127,7 @@ function AuthenticatedMenu({ user }: { user: AppUser }) {
             <p className="text-sm font-semibold text-gray-900 truncate">{user.full_name}</p>
             <p className="text-xs text-gray-500 truncate mt-0.5">{user.email}</p>
             {user.role === "admin" && (
-              <span className="mt-1.5 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-800">
+              <span className="mt-1.5 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
                 Admin
               </span>
             )}
@@ -141,7 +141,7 @@ function AuthenticatedMenu({ user }: { user: AppUser }) {
                 href={href}
                 onClick={() => setOpen(false)}
                 role="menuitem"
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:text-green-700 hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition-colors"
               >
                 <Icon className="w-4 h-4 shrink-0" />
                 {label}

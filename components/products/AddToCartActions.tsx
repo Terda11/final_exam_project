@@ -4,7 +4,9 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ShoppingCart, Zap, Check, Minus, Plus } from "lucide-react";
 import { useCart } from "@/lib/hooks/useCart";
+import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import AuthGateModal from "@/components/auth/AuthGateModal";
 import type { Product } from "@/types";
 
 interface ToastState {
@@ -22,6 +24,7 @@ export default function AddToCartActions({ product }: AddToCartActionsProps) {
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [toast, setToast] = useState<ToastState>({ visible: false, message: "", type: "success" });
+  const [authGateOpen, setAuthGateOpen] = useState(false);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -39,14 +42,23 @@ export default function AddToCartActions({ product }: AddToCartActionsProps) {
   function decrement() { setQuantity((q) => Math.max(1, q - 1)); }
   function increment() { setQuantity((q) => Math.min(product.stock, q + 1)); }
 
-  function handleAddToCart() {
+  async function checkAuth(): Promise<boolean> {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setAuthGateOpen(true); return false; }
+    return true;
+  }
+
+  async function handleAddToCart() {
     if (product.stock === 0) return;
+    if (!await checkAuth()) return;
     addToCart(product, quantity);
     showToast(`${product.name} added to cart!`);
   }
 
-  function handleBuyNow() {
+  async function handleBuyNow() {
     if (product.stock === 0) return;
+    if (!await checkAuth()) return;
     addToCart(product, quantity);
     router.push("/checkout");
   }
@@ -55,6 +67,12 @@ export default function AddToCartActions({ product }: AddToCartActionsProps) {
   const lowStock   = product.stock > 0 && product.stock < 5;
 
   return (
+    <>
+    <AuthGateModal
+      open={authGateOpen}
+      onClose={() => setAuthGateOpen(false)}
+      productName={product.name}
+    />
     <div className="space-y-4">
       <p
         className={cn(
@@ -163,5 +181,6 @@ export default function AddToCartActions({ product }: AddToCartActionsProps) {
       </div>
 
     </div>
+    </>
   );
 }
