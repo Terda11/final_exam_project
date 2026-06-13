@@ -288,33 +288,68 @@ export async function POST(request: NextRequest) {
   }
 
   // ── 2. Create order items ─────────────────────────────────────
-  const adminSupabase = await createAdminClient();
+  // First try to resolve product IDs using the user's client (RLS-safe)
+  // Only fall back to admin client for advanced operations
   const resolvedItems = await Promise.all(items.map(async (item) => {
-    const resolvedProductId = await resolveProductId(adminSupabase, item.product_id);
-    if (resolvedProductId) {
+    // Try resolving with user client first (products table has RLS read access)
+    const { data: productExists } = await supabase
+      .from("products")
+      .select("id")
+      .eq("id", item.product_id)
+      .single();
+
+    if (productExists?.id) {
       return {
         order_id:   order.id,
-        product_id: resolvedProductId,
+        product_id: productExists.id,
         quantity:   item.quantity,
         price:      Math.round(item.price * 100) / 100,
         line_total: Math.round(item.line_total * 100) / 100,
       };
     }
 
-    if (!item.product) {
-      return {
-        order_id:   order.id,
-        product_id: "",
-        quantity:   item.quantity,
-        price:      Math.round(item.price * 100) / 100,
-        line_total: Math.round(item.line_total * 100) / 100,
-      };
+    // Try admin client as fallback for legacy IDs or product creation
+    try {
+      const adminSupabase = await createAdminClient();
+      const resolvedProductId = await resolveProductId(adminSupabase, item.product_id);
+      if (resolvedProductId) {
+        return {
+          order_id:   order.id,
+          product_id: resolvedProductId,
+          quantity:   item.quantity,
+          price:      Math.round(item.price * 100) / 100,
+          line_total: Math.round(item.line_total * 100) / 100,
+        };
+      }
+
+      if (item.product) {
+        const productId = await findOrCreateProduct(adminSupabase, item.product, user.id);
+        if (productId) {
+          return {
+            order_id:   order.id,
+            product_id: productId,
+            quantity:   item.quantity,
+            price:      Math.round(item.price * 100) / 100,
+            line_total: Math.round(item.line_total * 100) / 100,
+          };
+        }
+      }
+    } catch {
+      // Admin client not available — use product_id as-is if it's a valid UUID
+      if (isValidUuid(item.product_id)) {
+        return {
+          order_id:   order.id,
+          product_id: item.product_id,
+          quantity:   item.quantity,
+          price:      Math.round(item.price * 100) / 100,
+          line_total: Math.round(item.line_total * 100) / 100,
+        };
+      }
     }
 
-    const productId = await findOrCreateProduct(adminSupabase, item.product, user.id);
     return {
       order_id:   order.id,
-      product_id: productId ?? "",
+      product_id: "",
       quantity:   item.quantity,
       price:      Math.round(item.price * 100) / 100,
       line_total: Math.round(item.line_total * 100) / 100,
@@ -356,19 +391,24 @@ export async function POST(request: NextRequest) {
   }
 
   // ── 3. Decrement stock (best-effort, non-atomic) ──────────────
-  for (const item of resolvedItems) {
-    const { data: product, error: productError } = await adminSupabase
-      .from("products")
-      .select("stock")
-      .eq("id", item.product_id)
-      .single();
+  try {
+    const adminSupabase = await createAdminClient();
+    for (const item of resolvedItems) {
+      const { data: product } = await adminSupabase
+        .from("products")
+        .select("stock")
+        .eq("id", item.product_id)
+        .single();
 
-    if (productError || !product) continue;
+      if (!product) continue;
 
-    await adminSupabase
-      .from("products")
-      .update({ stock: Math.max(0, product.stock - item.quantity) })
-      .eq("id", item.product_id);
+      await adminSupabase
+        .from("products")
+        .update({ stock: Math.max(0, product.stock - item.quantity) })
+        .eq("id", item.product_id);
+    }
+  } catch {
+    // Stock decrement is best-effort — order still succeeds if admin client is unavailable
   }
 
   return NextResponse.json({ id: order.id }, { status: 201 });
