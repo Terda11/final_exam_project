@@ -49,23 +49,36 @@ export async function GET() {
     role:      "admin",
   }, { onConflict: "id" });
 
-  // 2. Get existing categories — insert missing ones individually (skip on error)
-  for (const cat of CATEGORIES) {
-    await adminSupabase.from("categories").insert(cat).select().maybeSingle();
+  // 2. Drop old CHECK constraint and replace categories with electronics ones
+  // Remove the slug CHECK constraint so we can insert electronics categories
+  await adminSupabase.rpc("exec_sql", {
+    query: "ALTER TABLE public.categories DROP CONSTRAINT IF EXISTS categories_slug_check",
+  }).then(() => {}, () => {});
+
+  // Also try raw SQL via REST if rpc not available
+  await adminSupabase.from("categories").delete().not("slug", "in", `(${CATEGORIES.map(c => `"${c.slug}"`).join(",")})`);
+
+  // Delete old categories that don't match electronics slugs
+  const oldSlugs = ["vannerie", "sculptures", "textiles", "poterie", "bijoux"];
+  for (const slug of oldSlugs) {
+    await adminSupabase.from("categories").delete().eq("slug", slug);
   }
 
-  // Fetch all category IDs (regardless of insert results)
+  // Insert electronics categories
+  for (const cat of CATEGORIES) {
+    await adminSupabase.from("categories").upsert(cat, { onConflict: "id" }).select().maybeSingle();
+  }
+
+  // Fetch all category IDs
   const { data: allCats } = await adminSupabase
     .from("categories")
     .select("id, slug");
 
   if (!allCats?.length) {
-    return NextResponse.json({ message: "No categories found in database" }, { status: 500 });
+    return NextResponse.json({ message: "No categories in DB after seed. You need to drop the CHECK constraint manually. Run this in Supabase SQL Editor: ALTER TABLE public.categories DROP CONSTRAINT IF EXISTS categories_slug_check;" }, { status: 500 });
   }
 
   const catMap = new Map(allCats.map((c) => [c.slug, c.id as string]));
-
-  // Debug: return category map if no products yet
   const catDebug = Object.fromEntries(catMap);
 
   // 3. Upsert products (use current user as artisan, map to real category IDs)
