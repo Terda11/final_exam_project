@@ -4,8 +4,6 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ShoppingCart, Zap, Check, Minus, Plus } from "lucide-react";
 import { useCart } from "@/lib/hooks/useCart";
-import { useRequireAuth } from "@/lib/hooks/useAuth";
-import AuthGateModal from "@/components/auth/AuthGateModal";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/types";
 
@@ -22,7 +20,6 @@ interface AddToCartActionsProps {
 export default function AddToCartActions({ product }: AddToCartActionsProps) {
   const router = useRouter();
   const { addToCart } = useCart();
-  const { requireAuth, showLoginModal, setShowLoginModal } = useRequireAuth();
   const [quantity, setQuantity] = useState(1);
   const [toast, setToast] = useState<ToastState>({ visible: false, message: "", type: "success" });
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -44,18 +41,14 @@ export default function AddToCartActions({ product }: AddToCartActionsProps) {
 
   function handleAddToCart() {
     if (product.stock === 0) return;
-    requireAuth(() => {
-      addToCart(product, quantity);
-      showToast(`${product.name} added to cart!`);
-    });
+    addToCart(product, quantity);
+    showToast(`${product.name} added to cart!`);
   }
 
   function handleBuyNow() {
     if (product.stock === 0) return;
-    requireAuth(() => {
-      addToCart(product, quantity);
-      router.push("/checkout");
-    });
+    addToCart(product, quantity);
+    router.push("/checkout");
   }
 
   const outOfStock = product.stock === 0;
@@ -169,11 +162,6 @@ export default function AddToCartActions({ product }: AddToCartActionsProps) {
         {toast.message}
       </div>
 
-      <AuthGateModal
-        open={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        productName={product.name}
-      />
     </div>
   );
 }

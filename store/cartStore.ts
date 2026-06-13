@@ -14,6 +14,19 @@ interface CartState {
   getItemCount: () => number;
 }
 
+function normalizeCartItem(item: CartItem): CartItem {
+  if (!item.product_id.startsWith("p1000000-")) return item;
+  const normalizedId = item.product_id.replace(/^p1000000-/, "b1000000-");
+  return {
+    ...item,
+    product_id: normalizedId,
+    product: {
+      ...item.product,
+      id: normalizedId,
+    },
+  };
+}
+
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
@@ -61,6 +74,19 @@ export const useCartStore = create<CartState>()(
       getItemCount: () =>
         get().items.reduce((sum, item) => sum + item.quantity, 0),
     }),
-    { name: "techshop-cart" }
+    {
+      name: "techshop-cart",
+      version: 1,
+      onRehydrateStorage: () => (state) => {
+        if (!state?.items?.length) return;
+        const normalizedItems = state.items.map(normalizeCartItem);
+        const changed = normalizedItems.some(
+          (item, index) => item.product_id !== state.items[index]?.product_id
+        );
+        if (changed) {
+          set({ items: normalizedItems });
+        }
+      },
+    }
   )
 );

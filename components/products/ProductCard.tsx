@@ -5,15 +5,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { ShoppingCart, Check, Heart, Star, Eye } from "lucide-react";
 import { useCart } from "@/lib/hooks/useCart";
-import { useRequireAuth } from "@/lib/hooks/useAuth";
-import AuthGateModal from "@/components/auth/AuthGateModal";
 import { formatPrice, getImageUrl, cn } from "@/lib/utils";
 import { CATEGORY_LABELS } from "@/types";
 import type { Product } from "@/types";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
-  const { requireAuth, showLoginModal, setShowLoginModal } = useRequireAuth();
   const [added, setAdded] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -24,12 +21,10 @@ export default function ProductCard({ product }: { product: Product }) {
     e.preventDefault();
     if (product.stock === 0 || added) return;
 
-    requireAuth(() => {
-      setAdded(true);
-      addToCart(product, 1);
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => setAdded(false), 1800);
-    });
+    setAdded(true);
+    addToCart(product, 1);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setAdded(false), 1800);
   }
 
   const categoryLabel = product.category ? CATEGORY_LABELS[product.category.slug] : null;
@@ -156,11 +151,6 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
     </article>
 
-    <AuthGateModal
-      open={showLoginModal}
-      onClose={() => setShowLoginModal(false)}
-      productName={product.name}
-    />
     </>
   );
 }

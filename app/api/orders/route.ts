@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import type { ShippingAddress, PaymentMethod } from "@/types";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
+import type { ShippingAddress, PaymentMethod, Product, Category } from "@/types";
 
 // ── Input types ───────────────────────────────────────────────────
 interface OrderItemInput {
@@ -8,6 +8,7 @@ interface OrderItemInput {
   quantity:   number;
   price:      number;   // unit price snapshot
   line_total: number;   // price × quantity
+  product?:    Product;
 }
 
 interface CreateOrderBody {
@@ -18,6 +19,198 @@ interface CreateOrderBody {
   total:            number;   // subtotal (without shipping)
   shipping_fee:     number;
   grand_total:      number;   // total + shipping_fee
+}
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isValidUuid(value: string): boolean {
+  return UUID_REGEX.test(value);
+}
+
+function normalizeLegacyProductId(productId: string): string | null {
+  if (productId.startsWith("b1000000-")) {
+    return productId.replace(/^b1000000-/, "p1000000-");
+  }
+  if (productId.startsWith("p1000000-")) {
+    return productId.replace(/^p1000000-/, "b1000000-");
+  }
+  return null;
+}
+
+async function resolveProductId(
+  supabase: ReturnType<typeof createAdminClient>,
+  productId: string
+): Promise<string | null> {
+  const candidateIds = [productId, normalizeLegacyProductId(productId)].filter(Boolean) as string[];
+
+  for (const id of candidateIds) {
+    if (!isValidUuid(id)) continue;
+
+    const { data, error } = await supabase
+      .from("products")
+      .select("id")
+      .eq("id", id)
+      .single();
+
+    if (!error && data?.id) return data.id;
+  }
+
+  return null;
+}
+
+async function getCategoryIdFromProduct(
+  supabase: ReturnType<typeof createAdminClient>,
+  product: Product
+): Promise<string | null> {
+  if (product.category) {
+    return await findOrCreateCategory(supabase, product.category);
+  }
+
+  return await findOrCreateCategoryById(supabase, product.category_id);
+}
+
+async function ensureUserExists(
+  supabase: ReturnType<typeof createAdminClient>,
+  userId: string
+): Promise<boolean> {
+  if (!isValidUuid(userId)) return false;
+
+  const { data, error } = await supabase
+    .from("users")
+    .select("id")
+    .eq("id", userId)
+    .single();
+
+  return !error && Boolean(data?.id);
+}
+
+async function findOrCreateProduct(
+  supabase: ReturnType<typeof createAdminClient>,
+  product: Product,
+  fallbackArtisanId: string
+): Promise<string | null> {
+  const categoryId = await getCategoryIdFromProduct(supabase, product);
+  if (!categoryId) return null;
+
+  const candidateIds = [product.id, normalizeLegacyProductId(product.id)].filter(Boolean) as string[];
+  for (const id of candidateIds) {
+    if (!isValidUuid(id)) continue;
+
+    const { data: existingById, error: idError } = await supabase
+      .from("products")
+      .select("id")
+      .eq("id", id)
+      .single();
+
+    if (!idError && existingById?.id) return existingById.id;
+  }
+
+  const { data: existingByName, error: existingNameError } = await supabase
+    .from("products")
+    .select("id")
+    .eq("name", product.name)
+    .eq("category_id", categoryId)
+    .single();
+
+  if (!existingNameError && existingByName?.id) return existingByName.id;
+
+  const artisanId = await ensureUserExists(supabase, product.artisan_id)
+    ? product.artisan_id
+    : fallbackArtisanId;
+
+  const newProductId = isValidUuid(product.id) ? product.id : crypto.randomUUID();
+
+  const { data, error } = await supabase
+    .from("products")
+    .insert([
+      {
+        id:           newProductId,
+        name:         product.name,
+        description:  product.description,
+        price:        product.price,
+        stock:        product.stock,
+        category_id:  categoryId,
+        image_url:    product.image_url,
+        gallery:      product.gallery,
+        artisan_id:   artisanId,
+        is_featured:  product.is_featured,
+        is_active:    product.is_active,
+        weight_grams: product.weight_grams,
+      },
+    ])
+    .select("id")
+    .single();
+
+  if (!error && data?.id) return data.id;
+
+  const { data: fallback, error: fallbackError } = await supabase
+    .from("products")
+    .select("id")
+    .eq("name", product.name)
+    .eq("category_id", categoryId)
+    .single();
+
+  return !fallbackError && fallback?.id ? fallback.id : null;
+}
+
+async function findOrCreateCategoryById(
+  supabase: ReturnType<typeof createAdminClient>,
+  categoryId: string
+): Promise<string | null> {
+  if (!isValidUuid(categoryId)) return null;
+
+  const { data, error } = await supabase
+    .from("categories")
+    .select("id")
+    .eq("id", categoryId)
+    .single();
+
+  return !error && data?.id ? data.id : null;
+}
+
+async function findOrCreateCategory(
+  supabase: ReturnType<typeof createAdminClient>,
+  category: Category
+): Promise<string | null> {
+  const { data: existingById } = await supabase
+    .from("categories")
+    .select("id")
+    .eq("id", category.id)
+    .single();
+
+  if (existingById?.id) return existingById.id;
+
+  const { data: existingBySlug } = await supabase
+    .from("categories")
+    .select("id")
+    .eq("slug", category.slug)
+    .single();
+
+  if (existingBySlug?.id) return existingBySlug.id;
+
+  const { data, error } = await supabase
+    .from("categories")
+    .insert([
+      {
+        id:          category.id,
+        name:        category.name,
+        slug:        category.slug,
+        description: category.description,
+        image_url:   category.image_url,
+      },
+    ])
+    .select("id")
+    .single();
+
+  if (!error && data?.id) return data.id;
+
+  const { data: fallback } = await supabase
+    .from("categories")
+    .select("id")
+    .eq("slug", category.slug)
+    .single();
+
+  return fallback?.id ?? null;
 }
 
 // ── GET /api/orders — customer's own orders only ──────────────────
@@ -95,17 +288,66 @@ export async function POST(request: NextRequest) {
   }
 
   // ── 2. Create order items ─────────────────────────────────────
-  const orderItems = items.map((item) => ({
-    order_id:   order.id,
-    product_id: item.product_id,
-    quantity:   item.quantity,
-    price:      Math.round(item.price * 100) / 100,
-    line_total: Math.round(item.line_total * 100) / 100,
+  const adminSupabase = await createAdminClient();
+  const resolvedItems = await Promise.all(items.map(async (item) => {
+    const resolvedProductId = await resolveProductId(adminSupabase, item.product_id);
+    if (resolvedProductId) {
+      return {
+        order_id:   order.id,
+        product_id: resolvedProductId,
+        quantity:   item.quantity,
+        price:      Math.round(item.price * 100) / 100,
+        line_total: Math.round(item.line_total * 100) / 100,
+      };
+    }
+
+    if (!item.product) {
+      return {
+        order_id:   order.id,
+        product_id: "",
+        quantity:   item.quantity,
+        price:      Math.round(item.price * 100) / 100,
+        line_total: Math.round(item.line_total * 100) / 100,
+      };
+    }
+
+    const productId = await findOrCreateProduct(adminSupabase, item.product, user.id);
+    return {
+      order_id:   order.id,
+      product_id: productId ?? "",
+      quantity:   item.quantity,
+      price:      Math.round(item.price * 100) / 100,
+      line_total: Math.round(item.line_total * 100) / 100,
+    };
   }));
+
+  const invalidItemIndex = resolvedItems.findIndex((item) => !item.product_id);
+  if (invalidItemIndex !== -1) {
+    const rawItem = items[invalidItemIndex];
+    await supabase.from("orders").delete().eq("id", order.id);
+    console.error("Order creation: invalid product", { index: invalidItemIndex, item: rawItem, resolved: resolvedItems[invalidItemIndex] });
+    return NextResponse.json(
+      {
+        message: "Invalid product in cart",
+        invalid_index: invalidItemIndex,
+        product_id: rawItem?.product_id ?? null,
+        has_product_obj: Boolean(rawItem?.product),
+        product: rawItem?.product
+          ? {
+              id: rawItem.product.id,
+              name: rawItem.product.name,
+              category_id: rawItem.product.category_id,
+              artisan_id: rawItem.product.artisan_id,
+            }
+          : null,
+      },
+      { status: 400 }
+    );
+  }
 
   const { error: itemsError } = await supabase
     .from("order_items")
-    .insert(orderItems);
+    .insert(resolvedItems);
 
   if (itemsError) {
     // Rollback: delete the orphaned order
@@ -114,19 +356,19 @@ export async function POST(request: NextRequest) {
   }
 
   // ── 3. Decrement stock (best-effort, non-atomic) ──────────────
-  for (const item of items) {
-    const { data: product } = await supabase
+  for (const item of resolvedItems) {
+    const { data: product, error: productError } = await adminSupabase
       .from("products")
       .select("stock")
       .eq("id", item.product_id)
       .single();
 
-    if (product) {
-      await supabase
-        .from("products")
-        .update({ stock: Math.max(0, product.stock - item.quantity) })
-        .eq("id", item.product_id);
-    }
+    if (productError || !product) continue;
+
+    await adminSupabase
+      .from("products")
+      .update({ stock: Math.max(0, product.stock - item.quantity) })
+      .eq("id", item.product_id);
   }
 
   return NextResponse.json({ id: order.id }, { status: 201 });

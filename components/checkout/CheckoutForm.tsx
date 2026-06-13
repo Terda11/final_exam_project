@@ -37,6 +37,14 @@ type CardFields      = z.infer<typeof creditCardSchema>;
 type AllFields       = BaseFields & Partial<CardFields>;
 type FieldErrors     = Partial<Record<keyof AllFields, string>>;
 
+interface CheckoutOrderItem {
+  product_id: string;
+  quantity: number;
+  price: number;
+  line_total: number;
+  product: Product;
+}
+
 const INITIAL: AllFields = {
   full_name:      "",
   email:          "",
@@ -252,6 +260,7 @@ export default function CheckoutForm() {
         quantity:   item.quantity,
         price:      item.product.price,
         line_total: item.product.price * item.quantity,
+        product:    item.product,
       }));
 
       const res = await fetch("/api/orders", {
