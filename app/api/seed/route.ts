@@ -63,7 +63,10 @@ export async function GET() {
     return NextResponse.json({ message: "No categories found in database" }, { status: 500 });
   }
 
-  const catMap = new Map(allCats.map((c) => [c.slug, c.id]));
+  const catMap = new Map(allCats.map((c) => [c.slug, c.id as string]));
+
+  // Debug: return category map if no products yet
+  const catDebug = Object.fromEntries(catMap);
 
   // 3. Upsert products (use current user as artisan, map to real category IDs)
   const seedCatToSlug: Record<string, string> = {
@@ -85,17 +88,27 @@ export async function GET() {
     };
   });
 
-  const { error: prodError } = await adminSupabase
-    .from("products")
-    .upsert(productsWithArtisan, { onConflict: "id" });
+  // Insert products one by one to identify failures
+  let inserted = 0;
+  let skipped = 0;
+  for (const prod of productsWithArtisan) {
+    const { error: prodError } = await adminSupabase
+      .from("products")
+      .upsert(prod, { onConflict: "id" });
 
-  if (prodError) {
-    return NextResponse.json({ message: "Product insert failed", error: prodError.message }, { status: 500 });
+    if (prodError) {
+      // If category_id not found, skip this product
+      skipped++;
+      console.error("Product insert failed:", prod.name, prod.category_id, prodError.message);
+    } else {
+      inserted++;
+    }
   }
 
   return NextResponse.json({
     message: "Seed complete",
-    categories: CATEGORIES.length,
-    products: PRODUCTS.length,
+    categories_in_db: catDebug,
+    products_inserted: inserted,
+    products_skipped: skipped,
   });
 }
