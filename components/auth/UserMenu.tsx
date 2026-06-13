@@ -4,24 +4,47 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { User, ChevronDown, LogOut, Package, Settings, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { signOut } from "@/lib/actions/auth";
 import { cn } from "@/lib/utils";
 import type { User as AppUser } from "@/types";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
+// ── Helpers ───────────────────────────────────────────────────────
+
+async function fetchProfile(uid: string): Promise<AppUser | null> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from("users")
+    .select("id, email, full_name, phone, address, role, avatar_url, created_at, updated_at")
+    .eq("id", uid)
+    .single();
+  return data ?? null;
+}
+
+function buildFallback(u: SupabaseUser): AppUser {
+  return {
+    id:         u.id,
+    email:      u.email ?? "",
+    full_name:  (u.user_metadata?.full_name as string | undefined)
+                  ?? u.email?.split("@")[0]
+                  ?? "User",
+    phone:      null,
+    address:    null,
+    role:       "customer",
+    avatar_url: (u.user_metadata?.avatar_url as string | undefined) ?? null,
+    created_at: u.created_at,
+    updated_at: u.updated_at ?? u.created_at,
+  };
+}
+
 // ── Avatar ────────────────────────────────────────────────────────
 
-function Avatar({ user, size = "md" }: { user: AppUser; size?: "sm" | "md" }) {
+function Avatar({ user }: { user: AppUser }) {
   const initials = user.full_name
     .split(" ")
-    .map((n) => n[0])
+    .map((n) => n[0] ?? "")
     .slice(0, 2)
     .join("")
-    .toUpperCase();
-
-  const sizeClasses = size === "sm"
-    ? "w-7 h-7 text-xs"
-    : "w-8 h-8 text-sm";
+    .toUpperCase() || "U";
 
   if (user.avatar_url) {
     return (
@@ -29,49 +52,28 @@ function Avatar({ user, size = "md" }: { user: AppUser; size?: "sm" | "md" }) {
       <img
         src={user.avatar_url}
         alt={user.full_name}
-        className={cn("rounded-full object-cover ring-2 ring-white", sizeClasses)}
+        className="w-7 h-7 rounded-full object-cover ring-2 ring-white shrink-0"
       />
     );
   }
-
   return (
-    <div
-      className={cn(
-        "rounded-full bg-blue-600 text-white font-semibold",
-        "flex items-center justify-center ring-2 ring-white shrink-0",
-        sizeClasses
-      )}
-      aria-hidden="true"
-    >
+    <div className="w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center ring-2 ring-white shrink-0">
       {initials}
     </div>
   );
 }
 
-// ── Authenticated dropdown menu ───────────────────────────────────
+// ── Authenticated menu ────────────────────────────────────────────
 
 function AuthenticatedMenu({ user }: { user: AppUser }) {
-  const [open, setOpen]   = useState(false);
+  const [open, setOpen]       = useState(false);
   const [pending, setPending] = useState(false);
-  const ref               = useRef<HTMLDivElement>(null);
-  // Close on outside click
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  const ref                   = useRef<HTMLDivElement>(null);
 
-  // Close on Escape
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
+    const h = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("keydown", h);
+    return () => document.removeEventListener("keydown", h);
   }, []);
 
   const handleSignOut = async () => {
@@ -84,60 +86,51 @@ function AuthenticatedMenu({ user }: { user: AppUser }) {
 
   const menuItems = [
     ...(user.role === "admin"
-      ? [{ href: "/admin", icon: Settings, label: "Admin" }]
+      ? [{ href: "/admin",    icon: Settings, label: "Admin panel" }]
       : []),
-    { href: "/account",       icon: User,    label: "My profile" },
-    { href: "/account/orders", icon: Package, label: "My orders" },
+    { href: "/account",        icon: User,    label: "My profile"  },
+    { href: "/account/orders", icon: Package, label: "My orders"   },
   ];
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative shrink-0">
       <button
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="true"
         aria-expanded={open}
-        aria-label={`Account menu for ${user.full_name}`}
         className={cn(
-          "flex items-center gap-1.5 px-2 py-1.5 rounded-lg",
-          "text-sm font-medium transition-colors duration-150",
-          open
-            ? "text-blue-700 bg-blue-50"
-            : "text-slate-600 hover:text-blue-700 hover:bg-blue-50"
+          "flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-colors duration-150",
+          open ? "bg-blue-50 text-blue-700" : "text-slate-600 hover:bg-blue-50 hover:text-blue-700"
         )}
       >
-        <Avatar user={user} size="sm" />
-        <span className="hidden lg:block max-w-[100px] truncate">
+        <Avatar user={user} />
+        <span className="hidden sm:block text-sm font-medium max-w-[90px] truncate">
           {user.full_name.split(" ")[0]}
         </span>
-        <ChevronDown
-          className={cn("w-3.5 h-3.5 transition-transform duration-200", open && "rotate-180")}
-        />
+        <ChevronDown className={cn("w-3.5 h-3.5 shrink-0 transition-transform", open && "rotate-180")} />
       </button>
 
       {open && (
         <>
-          {/* Invisible full-screen backdrop to catch outside clicks */}
-          <div className="fixed inset-0 z-[199]" onClick={() => setOpen(false)} />
           <div
-            className={cn(
-              "absolute right-0 top-full mt-2 w-52 z-[200]",
-              "bg-white rounded-xl shadow-xl border border-gray-100",
-              "py-1.5 animate-scale-in"
-            )}
+            className="fixed inset-0 z-[199]"
+            onClick={() => setOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            className="absolute right-0 top-full mt-2 w-52 z-[200] bg-white rounded-xl shadow-xl border border-gray-100 py-1.5"
             role="menu"
           >
-            {/* Header */}
             <div className="px-4 py-3 border-b border-gray-100">
               <p className="text-sm font-semibold text-gray-900 truncate">{user.full_name}</p>
-              <p className="text-xs text-gray-500 truncate mt-0.5">{user.email}</p>
+              <p className="text-xs text-gray-400 truncate">{user.email}</p>
               {user.role === "admin" && (
-                <span className="mt-1.5 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
+                <span className="mt-1 inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">
                   Admin
                 </span>
               )}
             </div>
 
-            {/* Items */}
             <div className="py-1">
               {menuItems.map(({ href, icon: Icon, label }) => (
                 <Link
@@ -153,22 +146,14 @@ function AuthenticatedMenu({ user }: { user: AppUser }) {
               ))}
             </div>
 
-            {/* Sign out */}
             <div className="border-t border-gray-100 py-1">
               <button
                 onClick={handleSignOut}
                 disabled={pending}
                 role="menuitem"
-                className={cn(
-                  "flex items-center gap-3 w-full px-4 py-2.5",
-                  "text-sm text-red-600 hover:bg-red-50 transition-colors",
-                  "disabled:opacity-50 disabled:cursor-not-allowed"
-                )}
+                className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
               >
-                {pending
-                  ? <Loader2 className="w-4 h-4 shrink-0 animate-spin" />
-                  : <LogOut className="w-4 h-4 shrink-0" />
-                }
+                {pending ? <Loader2 className="w-4 h-4 animate-spin shrink-0" /> : <LogOut className="w-4 h-4 shrink-0" />}
                 {pending ? "Signing out…" : "Sign out"}
               </button>
             </div>
@@ -183,28 +168,20 @@ function AuthenticatedMenu({ user }: { user: AppUser }) {
 
 function GuestButtons() {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 shrink-0">
       <Link
         href="/login"
-        className={cn(
-          "flex items-center gap-1.5 px-3 py-1.5 rounded-lg",
-          "text-sm font-medium transition-colors duration-150",
-          "text-slate-600 hover:text-blue-700 hover:bg-blue-50"
-        )}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:text-blue-700 hover:bg-blue-50 transition-colors"
       >
-        <User className="w-4 h-4" />
+        <User className="w-4 h-4 shrink-0" />
         <span className="hidden sm:inline">Sign in</span>
       </Link>
       <Link
         href="/register"
-        className={cn(
-          "flex items-center px-3 py-1.5 rounded-lg",
-          "text-sm font-medium transition-colors duration-150",
-          "bg-blue-600 text-white hover:bg-blue-700"
-        )}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
       >
         <span className="hidden sm:inline">Register</span>
-        <User className="w-4 h-4 sm:hidden" />
+        <User className="w-4 h-4 shrink-0 sm:hidden" />
       </Link>
     </div>
   );
@@ -213,67 +190,55 @@ function GuestButtons() {
 // ── Main component ────────────────────────────────────────────────
 
 export default function UserMenu() {
-  const [user, setUser]     = useState<AppUser | null>(null);
+  const [user, setUser]       = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
+    let cancelled  = false;
 
-    const fetchProfile = async (uid: string) => {
-      const { data: profile } = await supabase
-        .from("users")
-        .select("id, email, full_name, phone, address, role, avatar_url, created_at, updated_at")
-        .eq("id", uid)
-        .single();
-      return profile
-        ? {
-            id:         profile.id,
-            email:      profile.email,
-            full_name:  profile.full_name,
-            phone:      profile.phone,
-            address:    profile.address,
-            role:       profile.role,
-            avatar_url: profile.avatar_url,
-            created_at: profile.created_at,
-            updated_at: profile.updated_at,
-          }
-        : null;
+    // 1. Load current session immediately on mount
+    const init = async () => {
+      try {
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (cancelled) return;
+        if (!authUser) { setUser(null); setLoading(false); return; }
+        const profile = await fetchProfile(authUser.id);
+        if (cancelled) return;
+        setUser(profile ?? buildFallback(authUser));
+      } catch {
+        if (!cancelled) setUser(null);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     };
 
-    const buildFallback = (authUser: SupabaseUser): AppUser => ({
-      id:         authUser.id,
-      email:      authUser.email ?? "",
-      full_name:  (authUser.user_metadata?.full_name as string | undefined)
-                    ?? authUser.email?.split("@")[0]
-                    ?? "User",
-      phone:      null,
-      address:    null,
-      role:       "customer",
-      avatar_url: (authUser.user_metadata?.avatar_url as string | undefined) ?? null,
-      created_at: authUser.created_at,
-      updated_at: authUser.updated_at ?? authUser.created_at,
-    });
+    void init();
 
-    // onAuthStateChange fires INITIAL_SESSION on mount — covers initial load + all changes
+    // 2. React to sign-in / sign-out events
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (!session?.user || event === "SIGNED_OUT") {
-          setUser(null);
-          setLoading(false);
+        if (event === "SIGNED_OUT") {
+          if (!cancelled) { setUser(null); setLoading(false); }
           return;
         }
-        try {
-          const profile = await fetchProfile(session.user.id);
-          setUser(profile ?? buildFallback(session.user));
-        } catch {
-          setUser(buildFallback(session.user));
-        } finally {
-          setLoading(false);
+        if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session?.user) {
+          try {
+            const profile = await fetchProfile(session.user.id);
+            if (!cancelled) setUser(profile ?? buildFallback(session.user));
+          } catch {
+            if (!cancelled) setUser(buildFallback(session.user));
+          } finally {
+            if (!cancelled) setLoading(false);
+          }
         }
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, []);
 
   if (loading) {
