@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useCart } from "@/lib/hooks/useCart";
 import { cn, formatCardNumber, formatExpiry, formatPrice } from "@/lib/utils";
+import type { Product } from "@/types";
 import { SHIPPING_FEE, SHIPPING_THRESHOLD } from "@/lib/constants/shipping";
 
 const CITIES = ["Kigali", "Gisenyi", "Huye", "Musanze", "Butare"] as const;

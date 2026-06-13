@@ -84,7 +84,7 @@ export const useCartStore = create<CartState>()(
           (item, index) => item.product_id !== state.items[index]?.product_id
         );
         if (changed) {
-          set({ items: normalizedItems });
+          useCartStore.setState({ items: normalizedItems });
         }
       },
     }
