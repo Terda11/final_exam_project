@@ -115,61 +115,65 @@ function AuthenticatedMenu({ user }: { user: AppUser }) {
       </button>
 
       {open && (
-        <div
-          className={cn(
-            "absolute right-0 top-full mt-2 w-52 z-50",
-            "bg-white rounded-xl shadow-lg border border-gray-100",
-            "py-1.5 animate-scale-in"
-          )}
-          role="menu"
-        >
-          {/* Header */}
-          <div className="px-4 py-3 border-b border-gray-100">
-            <p className="text-sm font-semibold text-gray-900 truncate">{user.full_name}</p>
-            <p className="text-xs text-gray-500 truncate mt-0.5">{user.email}</p>
-            {user.role === "admin" && (
-              <span className="mt-1.5 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
-                Admin
-              </span>
+        <>
+          {/* Invisible full-screen backdrop to catch outside clicks */}
+          <div className="fixed inset-0 z-[199]" onClick={() => setOpen(false)} />
+          <div
+            className={cn(
+              "absolute right-0 top-full mt-2 w-52 z-[200]",
+              "bg-white rounded-xl shadow-xl border border-gray-100",
+              "py-1.5 animate-scale-in"
             )}
-          </div>
-
-          {/* Items */}
-          <div className="py-1">
-            {menuItems.map(({ href, icon: Icon, label }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setOpen(false)}
-                role="menuitem"
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition-colors"
-              >
-                <Icon className="w-4 h-4 shrink-0" />
-                {label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Sign out */}
-          <div className="border-t border-gray-100 py-1">
-            <button
-              onClick={handleSignOut}
-              disabled={pending}
-              role="menuitem"
-              className={cn(
-                "flex items-center gap-3 w-full px-4 py-2.5",
-                "text-sm text-red-600 hover:bg-red-50 transition-colors",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
+            role="menu"
+          >
+            {/* Header */}
+            <div className="px-4 py-3 border-b border-gray-100">
+              <p className="text-sm font-semibold text-gray-900 truncate">{user.full_name}</p>
+              <p className="text-xs text-gray-500 truncate mt-0.5">{user.email}</p>
+              {user.role === "admin" && (
+                <span className="mt-1.5 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
+                  Admin
+                </span>
               )}
-            >
-              {pending
-                ? <Loader2 className="w-4 h-4 shrink-0 animate-spin" />
-                : <LogOut className="w-4 h-4 shrink-0" />
-              }
-              {pending ? "Signing out…" : "Sign out"}
-            </button>
+            </div>
+
+            {/* Items */}
+            <div className="py-1">
+              {menuItems.map(({ href, icon: Icon, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setOpen(false)}
+                  role="menuitem"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition-colors"
+                >
+                  <Icon className="w-4 h-4 shrink-0" />
+                  {label}
+                </Link>
+              ))}
+            </div>
+
+            {/* Sign out */}
+            <div className="border-t border-gray-100 py-1">
+              <button
+                onClick={handleSignOut}
+                disabled={pending}
+                role="menuitem"
+                className={cn(
+                  "flex items-center gap-3 w-full px-4 py-2.5",
+                  "text-sm text-red-600 hover:bg-red-50 transition-colors",
+                  "disabled:opacity-50 disabled:cursor-not-allowed"
+                )}
+              >
+                {pending
+                  ? <Loader2 className="w-4 h-4 shrink-0 animate-spin" />
+                  : <LogOut className="w-4 h-4 shrink-0" />
+                }
+                {pending ? "Signing out…" : "Sign out"}
+              </button>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
