@@ -49,30 +49,21 @@ export async function GET() {
     role:      "admin",
   }, { onConflict: "id" });
 
-  // 2. Check existing categories first, only insert missing ones
-  const { data: dbCats } = await adminSupabase
-    .from("categories")
-    .select("id, slug");
-
-  const existingSlugs = new Set((dbCats ?? []).map((c) => c.slug));
-  const missingCats = CATEGORIES.filter((c) => !existingSlugs.has(c.slug));
-
-  if (missingCats.length > 0) {
-    const { error: catError } = await adminSupabase
-      .from("categories")
-      .insert(missingCats);
-
-    if (catError) {
-      return NextResponse.json({ message: "Category insert failed", error: catError.message }, { status: 500 });
-    }
+  // 2. Get existing categories — insert missing ones individually (skip on error)
+  for (const cat of CATEGORIES) {
+    await adminSupabase.from("categories").insert(cat).select().maybeSingle();
   }
 
-  // Re-fetch all category IDs
+  // Fetch all category IDs (regardless of insert results)
   const { data: allCats } = await adminSupabase
     .from("categories")
     .select("id, slug");
 
-  const catMap = new Map((allCats ?? []).map((c) => [c.slug, c.id]));
+  if (!allCats?.length) {
+    return NextResponse.json({ message: "No categories found in database" }, { status: 500 });
+  }
+
+  const catMap = new Map(allCats.map((c) => [c.slug, c.id]));
 
   // 3. Upsert products (use current user as artisan, map to real category IDs)
   const seedCatToSlug: Record<string, string> = {
