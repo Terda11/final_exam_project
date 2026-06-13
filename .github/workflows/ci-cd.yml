@@ -193,8 +193,8 @@ jobs:
           # Cache multicouche : accélère les rebuilds successifs
           cache-from: type=gha
           cache-to:   type=gha,mode=max
-          # Provenance et SBOM : traçabilité de l'image (bonnes pratiques supply chain)
-          provenance: true
+          # Provenance désactivée — peut causer des échecs sur certains registries
+          provenance: false
           sbom:       false
 
       # ── Résumé dans l'interface GitHub ───────────────────────────────────
