@@ -213,7 +213,7 @@ export function ProductForm({ categories, initial, onSaved, onClose }: ProductFo
             <label className="block text-sm font-medium text-gray-700 mb-2">Main image</label>
             <div className="flex items-start gap-4">
               <div
-                className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center bg-gray-50 shrink-0 overflow-hidden cursor-pointer hover:border-green-400 transition-colors"
+                className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center bg-gray-50 shrink-0 overflow-hidden cursor-pointer hover:border-blue-400 transition-colors"
                 onClick={() => fileRef.current?.click()}
               >
                 {previewUrl ? (
@@ -304,7 +304,7 @@ export function ProductForm({ categories, initial, onSaved, onClose }: ProductFo
               <label key={key} className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox" name={key} checked={form[key]} onChange={handleChange}
-                  className="w-4 h-4 rounded text-green-600 focus:ring-green-500"
+                  className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm text-gray-700">
                   {key === "is_featured" ? "Featured product" : "Active product"}

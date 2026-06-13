@@ -35,13 +35,13 @@ export const ALLOWED_TRANSITIONS: Partial<Record<OrderStatus, OrderStatus[]>> = 
 };
 
 export const STATUS_BADGE: Record<OrderStatus, string> = {
-  pending:    "bg-yellow-100 text-yellow-800",
-  confirmed:  "bg-blue-100  text-blue-800",
+  pending:    "bg-amber-100  text-amber-800",
+  confirmed:  "bg-blue-100   text-blue-800",
   processing: "bg-indigo-100 text-indigo-800",
-  shipped:    "bg-purple-100 text-purple-800",
-  delivered:  "bg-green-100  text-green-800",
+  shipped:    "bg-blue-200   text-blue-900",
+  delivered:  "bg-blue-600   text-white",
   cancelled:  "bg-red-100    text-red-600",
-  refunded:   "bg-gray-100   text-gray-600",
+  refunded:   "bg-slate-100  text-slate-600",
 };
 
 // ── Types ──────────────────────────────────────────────────────────
@@ -117,7 +117,7 @@ export function OrderDetailModal({ order, onClose, onStatusChange }: OrderDetail
                     disabled={pending}
                     className={cn(
                       "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors",
-                      "border-gray-200 text-gray-700 hover:border-green-500 hover:text-green-700 hover:bg-green-50",
+                      "border-gray-200 text-gray-700 hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50",
                       "disabled:opacity-50 disabled:cursor-not-allowed"
                     )}
                   >
@@ -244,7 +244,7 @@ export function InlineStatusSelect({ order, onChange }: InlineStatusSelectProps)
         value={order.status}
         onChange={(e) => onChange(order.id, e.target.value as OrderStatus)}
         className={cn(
-          "appearance-none pl-2.5 pr-6 py-0.5 rounded-full text-xs font-semibold border-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-green-500",
+          "appearance-none pl-2.5 pr-6 py-0.5 rounded-full text-xs font-semibold border-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500",
           STATUS_BADGE[order.status]
         )}
       >

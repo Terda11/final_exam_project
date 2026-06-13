@@ -141,10 +141,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [mobileOpen]);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-slate-50">
 
       {/* Sidebar desktop (fixe) */}
-      <aside className="hidden lg:flex flex-col w-60 bg-gray-900 fixed inset-y-0 left-0 z-30">
+      <aside className="hidden lg:flex flex-col w-60 bg-blue-900 fixed inset-y-0 left-0 z-30">
         <SidebarContent />
       </aside>
 
@@ -161,7 +161,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Drawer mobile */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 lg:hidden",
+          "fixed inset-y-0 left-0 z-50 w-64 bg-blue-900 lg:hidden",
           "transition-transform duration-300 ease-out shadow-xl"
         )}
         style={{ transform: mobileOpen ? "translateX(0)" : "translateX(-100%)" }}
@@ -175,7 +175,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileOpen(true)}
-              className="lg:hidden p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+              className="lg:hidden p-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-blue-50 transition-colors"
               aria-label="Open menu"
             >
               <Menu className="w-5 h-5" />
@@ -183,14 +183,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <h1 className="text-base font-semibold text-gray-900 truncate">
               {getPageTitle(pathname)}
             </h1>
-            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-gray-900 text-white tracking-wide">
+            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-700 text-white tracking-wide">
               ADMIN
             </span>
           </div>
           <UserMenu />
         </header>
 
-        <main className="flex-1 p-4 sm:p-6 bg-gray-50/80">
+        <main className="flex-1 p-4 sm:p-6 bg-slate-50/80">
           <div className="max-w-7xl mx-auto">
             {children}
           </div>

@@ -90,7 +90,7 @@ export default function AdminOrdersPage() {
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value as StatusFilter)}
-              className="appearance-none pl-3 pr-8 py-2 border border-gray-200 rounded-lg text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
+              className="appearance-none pl-3 pr-8 py-2 border border-gray-200 rounded-lg text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
             >
               <option value="all">All statuses</option>
               {STATUS_OPTIONS.map((s) => (
@@ -105,7 +105,7 @@ export default function AdminOrdersPage() {
           <div className="overflow-x-auto">
             {loading ? (
               <div className="flex items-center justify-center py-16">
-                <Loader2 className="w-6 h-6 text-green-600 animate-spin" />
+                <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
               </div>
             ) : filtered.length === 0 ? (
               <div className="text-center py-16 text-gray-500">
@@ -150,7 +150,7 @@ export default function AdminOrdersPage() {
                       <td className="px-4 py-3 text-center">
                         <button
                           onClick={() => setDetail(order)}
-                          className="text-xs font-medium text-green-700 hover:underline px-2 py-1 rounded hover:bg-green-50 transition-colors"
+                          className="text-xs font-medium text-blue-700 hover:underline px-2 py-1 rounded hover:bg-blue-50 transition-colors"
                         >
                           View details
                         </button>

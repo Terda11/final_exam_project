@@ -13,7 +13,7 @@ export function AdminToast({ toast }: AdminToastProps) {
     <div
       className={cn(
         "fixed bottom-6 right-6 z-[60] flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-lg text-sm font-medium transition-all animate-slide-up",
-        toast.type === "ok" ? "bg-green-700 text-white" : "bg-red-600 text-white"
+        toast.type === "ok" ? "bg-blue-700 text-white" : "bg-red-600 text-white"
       )}
     >
       {toast.type === "ok"

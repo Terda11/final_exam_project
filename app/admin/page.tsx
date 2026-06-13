@@ -149,7 +149,7 @@ function BarChart({ data }: { data: DayData[] }) {
               {/* Bar */}
               <div
                 className={`w-full rounded-t-md transition-all duration-500 ${
-                  isMax ? "bg-green-600" : "bg-green-200 group-hover:bg-green-400"
+                  isMax ? "bg-blue-600" : "bg-blue-200 group-hover:bg-blue-400"
                 }`}
                 style={{ height: `${Math.max(pct, day.count > 0 ? 4 : 2)}px` }}
               />
@@ -207,8 +207,8 @@ export default async function AdminDashboard() {
       value:  formatPrice(stats.totalRevenue),
       sub:    `${formatPrice(stats.monthRevenue)} this month`,
       icon:   Banknote,
-      color:  "text-green-700",
-      iconBg: "bg-green-50",
+      color:  "text-blue-700",
+      iconBg: "bg-blue-50",
     },
     {
       label:  "Active products",
@@ -263,7 +263,7 @@ export default async function AdminDashboard() {
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm p-5">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-green-700" />
+              <BarChart3 className="w-4 h-4 text-blue-700" />
               <h3 className="text-sm font-semibold text-gray-900">Orders — last 7 days</h3>
             </div>
             <span className="text-xs text-gray-400">
@@ -277,7 +277,7 @@ export default async function AdminDashboard() {
         {/* Quick stats (1/3 width) */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 space-y-4">
           <div className="flex items-center gap-2 mb-1">
-            <TrendingUp className="w-4 h-4 text-green-700" />
+            <TrendingUp className="w-4 h-4 text-blue-700" />
             <h3 className="text-sm font-semibold text-gray-900">Today</h3>
           </div>
 

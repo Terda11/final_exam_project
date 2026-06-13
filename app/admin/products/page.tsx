@@ -126,7 +126,7 @@ export default function AdminProductsPage() {
           <div className="overflow-x-auto">
             {loading ? (
               <div className="flex items-center justify-center py-16">
-                <Loader2 className="w-6 h-6 text-green-600 animate-spin" />
+                <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
               </div>
             ) : products.length === 0 ? (
               <div className="text-center py-16 text-gray-500">
@@ -195,7 +195,7 @@ export default function AdminProductsPage() {
                         <td className="px-4 py-3 text-center">
                           <span className={cn(
                             "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold",
-                            product.is_active ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-500"
+                            product.is_active ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-500"
                           )}>
                             {product.is_active ? "Active" : "Inactive"}
                           </span>
@@ -204,7 +204,7 @@ export default function AdminProductsPage() {
                           <div className="flex items-center justify-center gap-1">
                             <button
                               onClick={() => { setEditing(product); setModal("edit"); }}
-                              className="p-1.5 rounded-lg text-gray-400 hover:text-green-700 hover:bg-green-50 transition-colors"
+                              className="p-1.5 rounded-lg text-gray-400 hover:text-blue-700 hover:bg-blue-50 transition-colors"
                               title="Edit"
                             >
                               <Pencil className="w-3.5 h-3.5" />
