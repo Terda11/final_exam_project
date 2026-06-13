@@ -38,7 +38,7 @@ function normalizeLegacyProductId(productId: string): string | null {
 }
 
 async function resolveProductId(
-  supabase: ReturnType<typeof createAdminClient>,
+  supabase: Awaited<ReturnType<typeof createAdminClient>>,
   productId: string
 ): Promise<string | null> {
   const candidateIds = [productId, normalizeLegacyProductId(productId)].filter(Boolean) as string[];
@@ -59,7 +59,7 @@ async function resolveProductId(
 }
 
 async function getCategoryIdFromProduct(
-  supabase: ReturnType<typeof createAdminClient>,
+  supabase: Awaited<ReturnType<typeof createAdminClient>>,
   product: Product
 ): Promise<string | null> {
   if (product.category) {
@@ -70,7 +70,7 @@ async function getCategoryIdFromProduct(
 }
 
 async function ensureUserExists(
-  supabase: ReturnType<typeof createAdminClient>,
+  supabase: Awaited<ReturnType<typeof createAdminClient>>,
   userId: string
 ): Promise<boolean> {
   if (!isValidUuid(userId)) return false;
@@ -85,7 +85,7 @@ async function ensureUserExists(
 }
 
 async function findOrCreateProduct(
-  supabase: ReturnType<typeof createAdminClient>,
+  supabase: Awaited<ReturnType<typeof createAdminClient>>,
   product: Product,
   fallbackArtisanId: string
 ): Promise<string | null> {
@@ -154,7 +154,7 @@ async function findOrCreateProduct(
 }
 
 async function findOrCreateCategoryById(
-  supabase: ReturnType<typeof createAdminClient>,
+  supabase: Awaited<ReturnType<typeof createAdminClient>>,
   categoryId: string
 ): Promise<string | null> {
   if (!isValidUuid(categoryId)) return null;
@@ -169,7 +169,7 @@ async function findOrCreateCategoryById(
 }
 
 async function findOrCreateCategory(
-  supabase: ReturnType<typeof createAdminClient>,
+  supabase: Awaited<ReturnType<typeof createAdminClient>>,
   category: Category
 ): Promise<string | null> {
   const { data: existingById } = await supabase
