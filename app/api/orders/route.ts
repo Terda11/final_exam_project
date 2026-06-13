@@ -287,19 +287,66 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // ── 2. Create order items ─────────────────────────────────────
-  // Use product_id directly if it's a valid UUID. The DB FK constraint on
-  // order_items.product_id will reject invalid references at insert time.
-  const resolvedItems = items.map((item) => {
-    const pid = item.product_id;
-    return {
-      order_id:   order.id,
-      product_id: isValidUuid(pid) ? pid : "",
-      quantity:   item.quantity,
-      price:      Math.round(item.price * 100) / 100,
-      line_total: Math.round(item.line_total * 100) / 100,
-    };
-  });
+  // ── 2. Ensure products exist, then create order items ──────────
+  // Products from the cart include full product data. If the product doesn't
+  // exist in the DB yet (seed not run), auto-create it using admin client.
+  for (const item of items) {
+    if (!isValidUuid(item.product_id)) continue;
+
+    // Check if product exists
+    const { data: exists } = await supabase
+      .from("products")
+      .select("id")
+      .eq("id", item.product_id)
+      .maybeSingle();
+
+    if (!exists && item.product) {
+      // Product missing — insert it using admin client
+      try {
+        const adminSupabase = await createAdminClient();
+
+        // Ensure category exists
+        if (item.product.category_id && isValidUuid(item.product.category_id)) {
+          const { data: catExists } = await adminSupabase
+            .from("categories")
+            .select("id")
+            .eq("id", item.product.category_id)
+            .maybeSingle();
+
+          if (!catExists && item.product.category) {
+            await adminSupabase.from("categories").upsert({
+              id:   item.product.category_id,
+              name: item.product.category.name ?? "Uncategorized",
+              slug: item.product.category.slug ?? "uncategorized",
+            }, { onConflict: "id" });
+          }
+        }
+
+        await adminSupabase.from("products").upsert({
+          id:          item.product.id,
+          name:        item.product.name,
+          description: item.product.description,
+          price:       item.product.price,
+          stock:       item.product.stock ?? 100,
+          category_id: item.product.category_id,
+          artisan_id:  user.id,
+          is_featured: item.product.is_featured ?? false,
+          is_active:   item.product.is_active ?? true,
+          image_url:   item.product.image_url,
+        }, { onConflict: "id" });
+      } catch (err) {
+        console.error("Failed to auto-create product", item.product_id, err);
+      }
+    }
+  }
+
+  const resolvedItems = items.map((item) => ({
+    order_id:   order.id,
+    product_id: isValidUuid(item.product_id) ? item.product_id : "",
+    quantity:   item.quantity,
+    price:      Math.round(item.price * 100) / 100,
+    line_total: Math.round(item.line_total * 100) / 100,
+  }));
 
   const invalidItemIndex = resolvedItems.findIndex((item) => !item.product_id);
   if (invalidItemIndex !== -1) {
