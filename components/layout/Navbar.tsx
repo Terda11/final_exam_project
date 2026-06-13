@@ -229,7 +229,7 @@ export default function Navbar() {
             <div className="flex items-center gap-2">
               <div className="hidden sm:block"><SearchBar /></div>
               <CartBtn count={itemCount} />
-              <div className="hidden sm:block"><UserMenu /></div>
+              <UserMenu />
               <button
                 onClick={() => setDrawerOpen(true)}
                 className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
