@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   LayoutDashboard,
   Package,
@@ -12,10 +12,104 @@ import {
   Menu,
   X,
   LogOut,
+  User,
+  ChevronDown,
 } from "lucide-react";
 import { signOut } from "@/lib/actions/auth";
+import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
-import UserMenu from "@/components/auth/UserMenu";
+
+// ── Admin user menu (header) ──────────────────────────────────────
+
+function AdminUserMenu() {
+  const [open, setOpen]       = useState(false);
+  const [email, setEmail]     = useState<string | null>(null);
+  const [name, setName]       = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      setEmail(user.email ?? null);
+      const full = user.user_metadata?.full_name as string | undefined;
+      setName(full ?? user.email?.split("@")[0] ?? "Admin");
+    });
+  }, []);
+
+  useEffect(() => {
+    const h = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
+
+  const initials = name
+    ? name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
+    : "A";
+
+  const handleSignOut = async () => {
+    setPending(true);
+    await signOut();
+    window.location.href = "/";
+  };
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="true"
+        aria-expanded={open}
+        className={cn(
+          "flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors",
+          open ? "bg-blue-50 text-blue-700" : "hover:bg-blue-50 hover:text-blue-700"
+        )}
+      >
+        <div className="w-8 h-8 rounded-full bg-blue-700 text-white text-sm font-bold flex items-center justify-center shrink-0">
+          {initials}
+        </div>
+        <span className="hidden sm:block text-sm font-medium text-gray-700 max-w-[120px] truncate">
+          {name ?? "Admin"}
+        </span>
+        <ChevronDown className={cn("w-3.5 h-3.5 text-gray-400 transition-transform", open && "rotate-180")} />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-2 w-56 z-[100] bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 animate-scale-in">
+          <div className="px-4 py-3 border-b border-gray-100">
+            <p className="text-sm font-semibold text-gray-900 truncate">{name ?? "Admin"}</p>
+            <p className="text-xs text-gray-500 truncate mt-0.5">{email ?? ""}</p>
+            <span className="mt-1.5 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
+              Admin
+            </span>
+          </div>
+          <div className="py-1">
+            <Link
+              href="/"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:text-blue-700 hover:bg-blue-50 transition-colors"
+            >
+              <User className="w-4 h-4 shrink-0" />
+              View store
+            </Link>
+          </div>
+          <div className="border-t border-gray-100 py-1">
+            <button
+              onClick={handleSignOut}
+              disabled={pending}
+              className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+            >
+              <LogOut className="w-4 h-4 shrink-0" />
+              {pending ? "Signing out…" : "Sign out"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ── Nav items ─────────────────────────────────────────────────────
 
@@ -171,7 +265,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Zone principale */}
       <div className="flex-1 flex flex-col min-w-0 lg:pl-60">
-        <header className="sticky top-0 z-20 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 gap-3 shrink-0">
+        <header className="sticky top-0 z-40 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 gap-3 shrink-0">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileOpen(true)}
@@ -187,7 +281,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               ADMIN
             </span>
           </div>
-          <UserMenu />
+          <AdminUserMenu />
         </header>
 
         <main className="flex-1 p-4 sm:p-6 bg-slate-50/80">
