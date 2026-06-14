@@ -86,7 +86,7 @@ export default function AboutPage() {
             <br />
             <span className="gradient-text">starts here.</span>
           </h1>
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
             TechShop is your one-stop destination for the latest electronics. We believe everyone deserves access to genuine, top-quality tech — at fair prices, with exceptional support.
           </p>
         </div>
@@ -104,7 +104,7 @@ export default function AboutPage() {
                 }`}
               >
                 <dt className="text-3xl font-black gradient-text">{s.value}</dt>
-                <dd className="mt-1 text-sm text-slate-400">{s.label}</dd>
+                <dd className="mt-1 text-sm text-slate-300">{s.label}</dd>
               </div>
             ))}
           </dl>
@@ -119,7 +119,7 @@ export default function AboutPage() {
             <h2 className="font-sans text-3xl font-black text-white mb-5 leading-tight">
               Built by tech enthusiasts, for tech enthusiasts
             </h2>
-            <div className="space-y-4 text-slate-400 text-sm leading-relaxed">
+            <div className="space-y-4 text-slate-300 text-sm leading-relaxed">
               <p>
                 TechShop was founded in 2024 with a simple idea: buying electronics online should be easy, transparent, and trustworthy — no hidden fees, no counterfeit products, no headaches.
               </p>
@@ -137,7 +137,7 @@ export default function AboutPage() {
               <div key={c.name} className="card p-4 hover:border-brand-500/40 transition-colors group">
                 <span className="text-3xl block mb-2 group-hover:scale-110 transition-transform">{c.emoji}</span>
                 <p className="text-sm font-semibold text-white">{c.name}</p>
-                <p className="text-xs text-slate-500 mt-1 leading-relaxed">{c.desc}</p>
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">{c.desc}</p>
               </div>
             ))}
           </div>
@@ -160,7 +160,7 @@ export default function AboutPage() {
                     <Icon className="w-5 h-5" />
                   </div>
                   <h3 className="text-sm font-bold text-white mb-2">{v.title}</h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">{v.desc}</p>
+                  <p className="text-xs text-slate-300 leading-relaxed">{v.desc}</p>
                 </div>
               );
             })}
@@ -175,7 +175,7 @@ export default function AboutPage() {
           <h2 className="font-sans text-3xl font-black text-white mb-4">
             Five categories, endless possibilities
           </h2>
-          <p className="text-slate-400 text-sm max-w-xl mx-auto">
+          <p className="text-slate-300 text-sm max-w-xl mx-auto">
             From pocket-sized smartphones to home theatre setups — we have the tech you need.
           </p>
         </div>
@@ -192,7 +192,7 @@ export default function AboutPage() {
                   {c.name}
                   <ArrowRight className="w-3 h-3 text-brand-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                 </h3>
-                <p className="text-xs text-slate-500 mt-1 leading-relaxed">{c.desc}</p>
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">{c.desc}</p>
               </div>
             </Link>
           ))}
@@ -213,7 +213,7 @@ export default function AboutPage() {
                   {m.initials}
                 </div>
                 <p className="text-sm font-semibold text-white">{m.name}</p>
-                <p className="text-xs text-slate-500 mt-0.5">{m.role}</p>
+                <p className="text-xs text-slate-300 mt-0.5">{m.role}</p>
               </div>
             ))}
           </div>
@@ -236,7 +236,7 @@ export default function AboutPage() {
           </div>
           <div className="text-left">
             <p className="text-sm font-semibold text-white">James Morrison</p>
-            <p className="text-xs text-slate-500">Verified buyer — Laptops</p>
+            <p className="text-xs text-slate-300">Verified buyer — Laptops</p>
           </div>
         </div>
       </section>

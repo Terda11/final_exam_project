@@ -96,7 +96,7 @@ function OrderItemRow({ item }: { item: RawOrderItem }) {
         <p className="text-sm font-medium text-white truncate">
           {item.product?.name ?? "Deleted product"}
         </p>
-        <p className="text-xs text-slate-400 mt-0.5 tabular-nums">
+        <p className="text-xs text-slate-300 mt-0.5 tabular-nums">
           {formatPrice(item.price)} × {item.quantity}
         </p>
       </div>
@@ -121,7 +121,7 @@ export default async function OrderConfirmationPage({ searchParams }: PageProps)
           <Package className="w-8 h-8 text-slate-400" aria-hidden="true" />
         </div>
         <h1 className="text-2xl font-black text-white mb-2">Order not found</h1>
-        <p className="text-slate-400 text-sm mb-6">
+        <p className="text-slate-300 text-sm mb-6">
           Reference{" "}
           <span className="font-mono font-semibold text-white">{shortRef(orderId)}</span>{" "}
           does not match any order on your account.
@@ -159,7 +159,7 @@ export default async function OrderConfirmationPage({ searchParams }: PageProps)
           <h1 className="font-sans text-3xl sm:text-4xl font-black text-white animate-slide-up">
             Order confirmed! 🎉
           </h1>
-          <p className="mt-3 text-slate-400 animate-slide-up">
+          <p className="mt-3 text-slate-300 animate-slide-up">
             Thank you for your purchase. Your order has been successfully placed.
           </p>
           <div className="mt-4 inline-flex items-center gap-2 bg-surface-700 border border-surface-500 text-slate-300 px-4 py-2 rounded-full text-sm">
@@ -184,18 +184,18 @@ export default async function OrderConfirmationPage({ searchParams }: PageProps)
               <Package className="w-4 h-4 text-brand-400" aria-hidden="true" />
               Items ordered
             </h2>
-            <p className="text-xs text-slate-500 mb-4">Placed on {formatDate(order.created_at)}</p>
+            <p className="text-xs text-slate-300 mb-4">Placed on {formatDate(order.created_at)}</p>
             <ul aria-label="Order items">
               {order.order_items.map((item) => (
                 <OrderItemRow key={item.id} item={item} />
               ))}
             </ul>
             <dl className="mt-4 pt-4 border-t border-surface-600 space-y-2 text-sm">
-              <div className="flex justify-between text-slate-400">
+              <div className="flex justify-between text-slate-300">
                 <dt>Subtotal</dt>
                 <dd className="tabular-nums text-white">{formatPrice(order.total)}</dd>
               </div>
-              <div className="flex justify-between text-slate-400">
+              <div className="flex justify-between text-slate-300">
                 <dt>Shipping</dt>
                 <dd className="tabular-nums">
                   {order.shipping_fee === 0
@@ -208,7 +208,7 @@ export default async function OrderConfirmationPage({ searchParams }: PageProps)
                 <dd className="tabular-nums">{formatPrice(order.grand_total)}</dd>
               </div>
             </dl>
-            <div className="mt-3 pt-3 border-t border-surface-600 text-xs text-slate-500 flex items-center gap-2">
+            <div className="mt-3 pt-3 border-t border-surface-600 text-xs text-slate-300 flex items-center gap-2">
               <span>Payment:</span>
               <span className="text-slate-300 font-medium">{paymentLabel}</span>
             </div>
@@ -229,7 +229,7 @@ export default async function OrderConfirmationPage({ searchParams }: PageProps)
               <p>{addr.country}</p>
             </address>
             {order.notes && (
-              <p className="mt-3 text-xs text-slate-500 italic border-t border-surface-600 pt-3">
+              <p className="mt-3 text-xs text-slate-300 italic border-t border-surface-600 pt-3">
                 Note: {order.notes}
               </p>
             )}

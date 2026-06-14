@@ -34,7 +34,7 @@ export default function OrderSummary() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">{item.product.name}</p>
-              <p className="text-xs text-slate-400 mt-0.5 tabular-nums">
+              <p className="text-xs text-slate-300 mt-0.5 tabular-nums">
                 {formatPrice(item.product.price)} × {item.quantity}
               </p>
             </div>
@@ -46,11 +46,11 @@ export default function OrderSummary() {
       </ul>
 
       <dl className="border-t border-surface-600 pt-4 space-y-2 text-sm">
-        <div className="flex justify-between text-slate-400">
+        <div className="flex justify-between text-slate-300">
           <dt>Subtotal</dt>
           <dd className="tabular-nums text-white">{formatPrice(total)}</dd>
         </div>
-        <div className="flex justify-between text-slate-400">
+        <div className="flex justify-between text-slate-300">
           <dt>Shipping</dt>
           <dd className={cn("tabular-nums", shipping === 0 ? "text-neon-400 font-medium" : "text-white")}>
             {shipping === 0 ? "Free" : formatPrice(shipping)}

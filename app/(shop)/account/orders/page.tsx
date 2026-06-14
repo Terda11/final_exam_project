@@ -62,7 +62,7 @@ export default async function AccountOrdersPage() {
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-white">My orders</h1>
-            <p className="text-slate-400 mt-1 text-sm">
+            <p className="text-slate-300 mt-1 text-sm">
               {orderList.length} order{orderList.length !== 1 ? "s" : ""} placed
             </p>
           </div>
@@ -75,7 +75,7 @@ export default async function AccountOrdersPage() {
           <div className="card p-12 text-center space-y-4">
             <ShoppingBag className="w-12 h-12 text-slate-600 mx-auto" />
             <p className="text-white font-semibold">No orders yet</p>
-            <p className="text-slate-400 text-sm">Browse our catalogue and place your first order.</p>
+            <p className="text-slate-300 text-sm">Browse our catalogue and place your first order.</p>
             <Link href="/products" className="btn-primary inline-block px-6 py-2.5 text-sm mt-2">
               Shop now
             </Link>
@@ -106,7 +106,7 @@ export default async function AccountOrdersPage() {
                           {ORDER_STATUS_LABELS[status] ?? order.status}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-400 mt-1">
+                      <p className="text-xs text-slate-300 mt-1">
                         {formatDate(order.created_at)} · {itemCount} item{itemCount !== 1 ? "s" : ""} · {PAYMENT_METHOD_LABELS[payment] ?? order.payment_method}
                       </p>
                     </div>
@@ -115,7 +115,7 @@ export default async function AccountOrdersPage() {
                       <span className="font-bold text-white tabular-nums text-sm">
                         {formatPrice(order.grand_total)}
                       </span>
-                      <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-brand-400 transition-colors" />
+                      <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-brand-400 transition-colors" />
                     </div>
                   </Link>
                 </li>
