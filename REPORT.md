@@ -10,7 +10,7 @@
 | **Instructor** | Eric Maniraguha |
 | **Academic Year** | 2025–2026 |
 | **Institution** | Université du Lac Kivu (UNILAK) |
-| **Project Name** | RwandaShop — Rwandan Artisan Marketplace |
+| **Project Name** | TechShop — Electronics Marketplace |
 | **Submission Date** | June 2026 |
 
 ---
@@ -37,23 +37,23 @@
 
 The African continent is undergoing a profound digital transformation. According to the International Finance Corporation (IFC), Africa's e-commerce market is projected to reach $75 billion by 2025, driven by increased mobile internet penetration and a growing middle class. Rwanda, in particular, has positioned itself as a continental leader in this transition through its ambitious **Rwanda Digital Economy Policy 2030**, which aims to achieve 80% digital financial inclusion and expand the ICT sector's contribution to GDP from 6% to 10%.
 
-Despite this promising macro-environment, small-scale artisans and craftspeople — who represent a significant cultural and economic segment of Rwandan society — remain largely excluded from the digital economy. Traditional crafts such as **Agaseke** (palm basketry), **Imigongo** (geometric cow-dung paintings), **Kitenge** textiles, and hand-crafted pottery have been sold almost exclusively through informal markets, roadside stalls, and occasional tourism-driven encounters. These artisans lack the digital infrastructure, technical knowledge, and financial resources to establish an online presence independently.
+Despite this promising macro-environment, many electronics retailers and vendors still lack a modern online sales channel for Rwanda-specific gadgets and devices. Local customers are often limited to physical shops or informal markets when searching for smartphones, laptops, speakers, and accessories, while cross-border buyers have few reliable digital storefronts to discover Rwandan electronics offers.
 
-RwandaShop was conceived and developed as a direct response to this gap. It is a full-stack e-commerce web application that provides Rwandan artisans with a professionally designed marketplace to list, manage, and sell their products online, while offering domestic and international buyers a curated, authentic shopping experience. The project was built as the capstone assignment for course EWA408510, demonstrating practical mastery of modern web application development, cloud-native architecture, and DevOps best practices.
+RwandaShop was conceived and developed as a direct response to this gap. It is a full-stack e-commerce web application that provides a professionally designed marketplace to list, manage, and sell electronics devices online, while offering domestic and international buyers a curated, trustworthy shopping experience. The project was built as the capstone assignment for course EWA408510, demonstrating practical mastery of modern web application development, cloud-native architecture, and DevOps best practices.
 
 ---
 
 ## 2. Problem Statement
 
-Rwanda's artisan sector faces three interconnected challenges that prevent effective participation in e-commerce:
+Rwanda's consumer electronics market faces three interconnected challenges that prevent effective participation in e-commerce:
 
-**Challenge 1 — Market access barrier.** Artisans depend on physical presence at local markets (e.g., Kimironko Market, Nyirangarama) or intermediary exporters who capture a disproportionate share of the margin. An artisan producing an Agaseke basket that sells for 35,000 RWF to a tourist may receive as little as 8,000 RWF through a multi-tier reseller chain.
+**Challenge 1 — Market access barrier.** Many electronics vendors still rely on physical shops and local kiosks rather than having a strong online presence. Customers looking for smartphones, laptops, audio equipment, or accessories often have limited visibility into available stock, pricing, and delivery options.
 
-**Challenge 2 — Visibility and discoverability.** Authentic Rwandan crafts have genuine international demand — particularly from diaspora communities, tourism-related buyers, and ethical consumer markets in Europe and North America. However, without a searchable, categorised online catalogue, these products are invisible to potential buyers outside of the immediate geographic area.
+**Challenge 2 — Visibility and discoverability.** Electronics shoppers need a searchable, categorised catalogue to compare devices, filters, and brands in one place. Without a reliable online storefront, product discovery is fragmented across informal sellers and physical retail locations.
 
-**Challenge 3 — Transaction and trust infrastructure.** Cash-on-delivery remains the dominant payment method in Rwanda (used in approximately 68% of e-commerce transactions, according to a 2023 RDB survey). Any viable marketplace must accommodate local payment methods such as MTN Mobile Money and Airtel Money alongside standard cash-on-delivery, rather than forcing customers through international card payment systems with which they are unfamiliar.
+**Challenge 3 — Transaction and trust infrastructure.** Cash-on-delivery remains the dominant payment method in Rwanda (used in approximately 68% of e-commerce transactions, according to a 2023 RDB survey). Any viable marketplace must accommodate local payment methods such as MTN Mobile Money and Airtel Money alongside cash-on-delivery, rather than forcing customers through international card payment systems with which they are unfamiliar.
 
-RwandaShop addresses all three challenges through a centralised, professionally engineered marketplace that lowers the barrier to online selling for artisans, increases product discoverability through category-based browsing and full-text search, and supports Rwanda-specific payment methods.
+RwandaShop addresses all three challenges through a centralised, professionally engineered marketplace that lowers the barrier to online selling for electronics vendors, increases product discoverability through category-based browsing and full-text search, and supports Rwanda-specific payment methods.
 
 ---
 
@@ -334,7 +334,7 @@ The following screenshots document the key user-facing screens of RwandaShop. Al
 
 ## 9. Deployment Link
 
-**Live Application:** [https://rwandashop.rw](https://rwandashop.rw) *(configure Vercel + domain — see README Deployment section)*
+**Live Application:** (https://rwanda-shop.vercel.app) *(configure Vercel + domain — see README Deployment section)*
 
 > *The application is deployed on Vercel's global edge network. The Supabase project is hosted on the Frankfurt (eu-central-1) region. Deployment is triggered automatically on every push to the `main` branch via the GitHub Actions CI/CD pipeline described in Section 10. Set the `VERCEL_DEPLOY_HOOK_URL` secret in GitHub to enable automatic deploys.*
 
