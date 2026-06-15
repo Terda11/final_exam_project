@@ -2,52 +2,52 @@
 
 Electronics e-commerce platform for Rwanda — smartphones, laptops, projectors, audio gear and accessories.
 
-## Stack technique
+## Technology Stack
 
-| Couche | Technologies |
+| Layer | Technologies |
 |---|---|
 | Framework | Next.js 14 (App Router) · React 18 · TypeScript 5 |
-| Styles | Tailwind CSS · Palette Rwanda personnalisée |
-| État client | Zustand (panier persistant) |
+| Styling | Tailwind CSS · Custom Rwanda-inspired color palette |
+| Client state | Zustand (persistent cart) |
 | Backend/DB | Supabase (PostgreSQL 15 + Auth + Storage) |
 | Validation | Zod |
-| Icônes | lucide-react |
+| Icons | lucide-react |
 | CI/CD | GitHub Actions · Docker · Vercel |
 
-## Fonctionnalités
+## Features
 
-- Catalogue produits avec recherche, filtres par catégorie et pagination
-- Panier persistant (localStorage via Zustand)
-- Authentification email/OAuth (Supabase Auth)
-- Checkout avec adresse de livraison et choix du mode de paiement (Cash, MTN MoMo, Airtel Money)
-- Suivi des commandes pour les clients
-- Dashboard admin : gestion des produits et des commandes
-- Row-Level Security (RLS) PostgreSQL
-- Design responsive avec thème aux couleurs du Rwanda
+- Product catalog with search, category filters, and pagination
+- Persistent cart (localStorage via Zustand)
+- Email/OAuth authentication (Supabase Auth)
+- Checkout form with shipping address and payment method selection (Cash on Delivery, MTN MoMo, Airtel Money)
+- Customer order tracking
+- Admin dashboard with product and order management
+- PostgreSQL Row-Level Security (RLS)
+- Responsive design with a Rwanda-inspired theme
 
-## Structure du projet
+## Project Structure
 
 ```
 app/
-├── (auth)/          # Pages login / register
-├── (shop)/          # Boutique publique (accueil, produits, panier, checkout)
-└── admin/           # Dashboard admin (protégé)
-components/          # Composants React réutilisables
+├── (auth)/          # Login / register pages
+├── (shop)/          # Public storefront (home, products, cart, checkout)
+└── admin/           # Admin dashboard (protected)
+components/          # Reusable React components
 lib/
-├── supabase/        # Clients navigateur, serveur et types générés
+├── supabase/        # Browser and server Supabase clients + generated types
 ├── actions/         # Server Actions (auth)
 └── hooks/           # useCart, useProducts
-store/               # Store Zustand (panier)
-types/               # Types domaine + schémas Zod
+store/               # Zustand store (cart)
+types/               # Domain types + Zod schemas
 database/            # schema.sql + seed.sql
 ```
 
-## Démarrage rapide
+## Quick Start
 
-### Prérequis
+### Prerequisites
 
 - Node.js 18+
-- Un projet Supabase (ou Docker pour le local)
+- A Supabase project (or Docker for local development)
 
 ### Installation
 
@@ -57,13 +57,13 @@ cd final_exam_project
 npm install
 ```
 
-### Variables d'environnement
+### Environment Variables
 
 ```bash
 cp .env.local.example .env.local
 ```
 
-Remplir `.env.local` :
+Fill `.env.local` with:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://<project>.supabase.co
@@ -74,102 +74,102 @@ NEXT_PUBLIC_FREE_SHIPPING_THRESHOLD=20000
 NEXT_PUBLIC_SHIPPING_FEE=2000
 ```
 
-### Base de données
+### Database Setup
 
-Exécuter le script SQL dans Supabase (ou Docker) :
+Run the SQL scripts in Supabase (or Docker):
 
 ```bash
 psql -f database/schema.sql
-psql -f database/seed.sql   # données de démonstration
+psql -f database/seed.sql   # sample data
 ```
 
-### Lancer en développement
+### Run Locally
 
 ```bash
 npm run dev
 ```
 
-L'application est disponible sur [http://localhost:3000](http://localhost:3000).
+The application is available at [http://localhost:3000](http://localhost:3000).
 
-## Démarrage avec Docker
+## Docker Setup
 
 ```bash
 docker compose up --build
 ```
 
-Cela lance l'application Next.js sur le port `3000` et PostgreSQL 15 sur `5432`.
+This starts the Next.js app on port `3000` and PostgreSQL 15 on `5432`.
 
-## Scripts disponibles
+## Available Scripts
 
-| Commande | Description |
+| Command | Description |
 |---|---|
-| `npm run dev` | Serveur de développement |
-| `npm run build` | Build de production |
-| `npm run start` | Serveur de production |
-| `npm run lint` | ESLint |
-| `npm run format` | Prettier |
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+| `npm run format` | Run Prettier |
 
-## Rôles utilisateurs
+## User Roles
 
-| Rôle | Accès |
+| Role | Access |
 |---|---|
-| Visiteur | Catalogue, pages produit |
-| Client (`customer`) | + Panier, checkout, mes commandes |
-| Admin (`admin`) | + Dashboard admin, CRUD produits, toutes les commandes |
+| Visitor | Browse catalog, view product pages |
+| Customer (`customer`) | + Cart, checkout, view orders |
+| Admin (`admin`) | + Admin dashboard, product CRUD, view all orders |
 
-Les routes sont protégées par `middleware.ts` et les politiques RLS Supabase.
+Routes are protected by `middleware.ts` and Supabase RLS policies.
 
-## Modes de paiement
+## Payment Methods
 
-- **Cash on delivery** — paiement à la livraison
-- **MTN MoMo** — Mobile Money MTN
-- **Airtel Money** — Mobile Money Airtel
+- **Cash on Delivery** — pay when your order arrives
+- **MTN MoMo** — MTN Mobile Money
+- **Airtel Money** — Airtel Mobile Money
 
-Livraison gratuite à partir de **20 000 RWF**, sinon **2 000 RWF**.
+Free shipping for orders above **20,000 RWF**, otherwise **2,000 RWF**.
 
-## Déploiement
+## Deployment
 
-Le pipeline GitHub Actions (`.github/workflows/ci-cd.yml`) effectue automatiquement le lint, le build et le déploiement sur **Vercel** à chaque push sur `main`.
+The GitHub Actions pipeline (`.github/workflows/ci-cd.yml`) automatically runs lint, build, and deployment to **Vercel** on each push to `main`.
 
-### Étapes pour activer le déploiement en ligne (obligatoire)
+### Required Deployment Steps
 
-1. **Créer un projet Vercel** — importer `https://github.com/Terda11/final_exam_project`
-2. **Variables d'environnement Vercel** — ajouter `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_FREE_SHIPPING_THRESHOLD`, `NEXT_PUBLIC_SHIPPING_FEE`
-3. **Deploy Hook** — Vercel → Settings → Git → Deploy Hooks → copier l'URL
-4. **Secret GitHub** — Settings → Secrets → `VERCEL_DEPLOY_HOOK_URL` = URL du hook
-5. **URL de production** — noter l'URL Vercel (ex. `https://your-project.vercel.app`) dans `REPORT.md` Section 9
+1. **Create a Vercel project** — import `https://github.com/Terda11/final_exam_project`
+2. **Add Vercel environment variables** — `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_FREE_SHIPPING_THRESHOLD`, `NEXT_PUBLIC_SHIPPING_FEE`
+3. **Create a deploy hook** — Vercel → Settings → Git → Deploy Hooks → copy the URL
+4. **Create GitHub secret** — Settings → Secrets → `VERCEL_DEPLOY_HOOK_URL` = deploy hook URL
+5. **Record production URL** — note the Vercel URL `https://rwanda-shop.vercel.app` in Section 9 of `REPORT.md`
 
-L'image Docker utilise un build multi-stage (deps → builder → runner Alpine) avec un utilisateur non-root.
+The Docker image uses a multi-stage build (deps → builder → runner) on Alpine Linux with a non-root user.
 
-### Docker — preuve de build et exécution
+### Docker Build & Run Verification
 
 ```bash
-# Construire l'image
+# Build the image
 npm run docker:build
 
-# Lancer avec docker-compose (app + PostgreSQL)
+# Run with docker-compose (app + PostgreSQL)
 docker compose up --build
 
-# Vérifier que l'app répond
+# Verify the app responds
 curl http://localhost:3000/api/health
 ```
 
-Image publiée sur GitHub Container Registry : `ghcr.io/terda11/final_exam_project:latest`
+The image is published to GitHub Container Registry: `ghcr.io/terda11/final_exam_project:latest`
 
-## Licence
+## License
 
-Projet académique UNILAK — tous droits réservés.
+Academic project for UNILAK — all rights reserved.
 
-## Checklist des exigences du projet
+## Project Requirements Checklist
 
-| # | Exigence | Statut | Fichiers clés |
+| # | Requirement | Status | Key files |
 |---|----------|--------|---------------|
-| 1 | UI responsive, homepage, navigation | ✅ | `app/(shop)/page.tsx`, `components/layout/Navbar.tsx` |
-| 2 | Gestion produits (liste, détail, catégories) | ✅ | `app/(shop)/products/`, `lib/constants/categories.ts` |
-| 3 | Panier (ajout/suppression, quantités, totaux) | ✅ | `store/cartStore.ts`, `app/(shop)/cart/` |
-| 4 | Checkout (client, résumé, confirmation) | ✅ | `app/(shop)/checkout/`, `order-confirmation/` |
-| 5 | Base de données (produits, clients, commandes) | ✅ | `database/schema.sql`, Supabase |
-| 6 | GitHub (hébergement + historique commits) | ✅ | [github.com/Terda11/final_exam_project](https://github.com/Terda11/final_exam_project) |
-| 7 | Déploiement en ligne | ⚙️ | Configurer Vercel (voir section Déploiement) |
+| 1 | Responsive UI, homepage, navigation | ✅ | `app/(shop)/page.tsx`, `components/layout/Navbar.tsx` |
+| 2 | Product management (list, detail, categories) | ✅ | `app/(shop)/products/`, `lib/constants/categories.ts` |
+| 3 | Cart (add/remove, quantities, totals) | ✅ | `store/cartStore.ts`, `app/(shop)/cart/` |
+| 4 | Checkout (client, summary, confirmation) | ✅ | `app/(shop)/checkout/`, `order-confirmation/` |
+| 5 | Database (products, customers, orders) | ✅ | `database/schema.sql`, Supabase |
+| 6 | GitHub (hosting + commit history) | ✅ | [github.com/Terda11/final_exam_project](https://github.com/Terda11/final_exam_project) |
+| 7 | Online deployment | ⚙️ | Configure Vercel (see Deployment section) |
 | 8 | CI/CD (GitHub Actions) | ✅ | `.github/workflows/ci-cd.yml` |
 | 9 | Docker (Dockerfile + docker-compose) | ✅ | `Dockerfile`, `docker-compose.yml` |
