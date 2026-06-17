@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.75rem;
+  }
+
+  body {
+    background: linear-gradient(160deg, #eef2ff 0%, #f0f9ff 35%, #f8fafc 70%, #f1f5f9 100%);
+    background-attachment: fixed;
+    color: #0f172a;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #e0e7ff; }
+  ::-webkit-scrollbar-thumb { background: #93c5fd; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #2563eb; }
+}
+
+@layer components {
+  /* ── Buttons ───────────────────────────── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold
+           px-5 py-2.5 rounded-xl
+           hover:from-blue-700 hover:to-indigo-700 active:scale-[.98]
+           transition-all duration-150
+           disabled:opacity-50 disabled:cursor-not-allowed
+           shadow-md shadow-blue-600/20;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           bg-white/90 text-slate-700 font-semibold
+           px-5 py-2.5 rounded-xl border-2 border-blue-100
+           hover:bg-blue-50 hover:border-blue-300
+           active:scale-[.98] transition-all duration-150;
+  }
+
+  .btn-ghost {
+    @apply text-slate-600 px-4 py-2 rounded-lg font-medium
+           hover:bg-blue-50 hover:text-blue-800
+           transition-all duration-150;
+  }
+
+  /* ── Cards ─────────────────────────────── */
+  .card {
+    @apply bg-white/90 backdrop-blur-sm rounded-xl border-2 border-blue-100
+           shadow-sm overflow-hidden;
+  }
+
+  /* ── Inputs ────────────────────────────── */
+  .input {
+    @apply w-full px-3.5 py-2.5 rounded-xl text-sm
+           bg-white border-2 border-blue-100
+           text-slate-800 placeholder:text-slate-400
+           focus:outline-none focus:ring-2 focus:ring-blue-500
+           focus:border-transparent transition-colors duration-150;
+  }
+
+  .input-error {
+    @apply border-red-400 focus:ring-red-400;
+  }
+
+  /* ── Badges ────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5
+           rounded-full text-[10px] font-bold uppercase tracking-wide;
+  }
+
+  /* ── Section label ─────────────────────── */
+  .section-label {
+    @apply text-xs font-bold uppercase tracking-widest text-indigo-600;
+  }
+
+  /* ── Price tag ─────────────────────────── */
+  .price {
+    @apply text-lg font-black text-blue-700 tabular-nums;
+  }
+
+  /* ── Page sections ─────────────────────── */
+  .section-surface {
+    @apply bg-gradient-to-br from-white via-blue-50/40 to-indigo-50/30;
+  }
+}
+
+/* ── 3D card flip ──────────────────────────── */
+.perspective-1000  { perspective: 1000px; }
+.transform-style-3d { transform-style: preserve-3d; }
+.backface-hidden    { backface-visibility: hidden; }
+.rotate-y-180       { transform: rotateY(180deg); }
